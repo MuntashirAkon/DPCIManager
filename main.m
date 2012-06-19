@@ -2,8 +2,8 @@
 //  main.m
 //  DPCIManager
 //
-//  Created by Duddie on 5/9/07.
-//  Copyright __MyCompanyName__ 2007. All rights reserved.
+//  Created on 5/9/07.
+//  Licensed under GPLv3, full text at http://www.gnu.org/licenses/gpl-3.0.txt
 //
 
 #import <Cocoa/Cocoa.h>
