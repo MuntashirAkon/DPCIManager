@@ -551,15 +551,37 @@ void enumprops(CFTypeRef object)
     [DPCIReceiver addValue: @"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [DPCIReceiver setValue:[NSString stringWithFormat: @"%u",[postData length]] forHTTPHeaderField:@"Content-Length"];
     [DPCIReceiver setHTTPBody: [postData dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:true]];
-    [NSURLConnection sendAsynchronousRequest:DPCIReceiver queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *responseData, NSData *data, NSError *err){
-        NSHTTPURLResponse *httpData = (NSHTTPURLResponse *)responseData;
-        if (httpData.statusCode!=200) {
-            [submitButton setLabel: @"Failed"];
-        }
-        else{
-            [submitButton setLabel: @"Success"];
-        }
-    }];
+    NSURLConnection* connector = [[NSURLConnection alloc] initWithRequest:DPCIReceiver delegate:self];
+    
+}
+-(void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    NSHTTPURLResponse *httpData = (NSHTTPURLResponse *)response;
+    if (httpData.statusCode!=200) {
+        [submitButton setLabel: @"Failed"];
+    }
+    else{
+        [submitButton setLabel: @"Success"];
+    }
+}
+-(NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse 
+{
+    return nil;
+}
+-(NSURLRequest *) connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response
+{
+    return request;
+}
+-(void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    
+}
+-(void) connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
+{
+    
+}
+-(void) connectionDidFinishLoading:(NSURLConnection *) connection
+{
     
 }
 
