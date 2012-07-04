@@ -10,6 +10,8 @@ typedef struct pci_devices_tab
 {
 	unsigned int vendor_id;
 	unsigned int device_id;
+    unsigned int svendor_id;
+	unsigned int sdevice_id;
 	unsigned int device_class;
 	
 } pci_devices_tab_t;

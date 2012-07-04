@@ -354,7 +354,7 @@ void enumprops(CFTypeRef object)
     mach_port_t masterPort;
     io_iterator_t itThis;
     io_service_t service;
-    CFDataRef vendorID, deviceID, model;
+    CFDataRef vendorID, deviceID, svendorID, sdeviceID, model;
 	
 	// Get a mach port for us and check for errors
     err = IOMasterPort(MACH_PORT_NULL, &masterPort);
@@ -480,12 +480,16 @@ void enumprops(CFTypeRef object)
 				
 				vendorID = IORegistryEntryCreateCFProperty(service, CFSTR("vendor-id"),kCFAllocatorDefault,0);
 				deviceID = IORegistryEntryCreateCFProperty(service, CFSTR("device-id"),kCFAllocatorDefault,0);
+                sdeviceID = IORegistryEntryCreateCFProperty(service, CFSTR("subsystem-id"),kCFAllocatorDefault,0);
+                svendorID = IORegistryEntryCreateCFProperty(service, CFSTR("subsystem-vendor-id"),kCFAllocatorDefault,0);
 				model = IORegistryEntryCreateCFProperty(service, CFSTR("compatible"),kCFAllocatorDefault,0);
 				CFDataRef irqline;
 				irqline = IORegistryEntryCreateCFProperty(service, CFSTR("model"),kCFAllocatorDefault,0);
 				//printf("COMPATIBLE %s\n", ((char*)CFDataGetBytePtr(model)));
 				pciDevs[pciDevsCount].vendor_id = *((UInt32*)CFDataGetBytePtr(vendorID));
 				pciDevs[pciDevsCount].device_id = *((UInt32*)CFDataGetBytePtr(deviceID));
+                if(sdeviceID!=nil){pciDevs[pciDevsCount].sdevice_id = *((UInt32*)CFDataGetBytePtr(sdeviceID));}
+                if(svendorID!=nil){pciDevs[pciDevsCount].svendor_id = *((UInt32*)CFDataGetBytePtr(svendorID));}
 				pciDevs[pciDevsCount].device_class = *((UInt32*)CFDataGetBytePtr(classCode));
 				pciDevsCount++;
 				
@@ -521,9 +525,11 @@ void enumprops(CFTypeRef object)
 	{
 		case 0:
 			return [NSString stringWithFormat:@"%04X:%04X", pciDevs[rowIndex].vendor_id, pciDevs[rowIndex].device_id];
-		case 1:
-			return [NSString stringWithFormat:@"%s", [self vendorString: pciDevs[rowIndex].vendor_id]];
+        case 1:
+			return [NSString stringWithFormat:@"%04X:%04X", pciDevs[rowIndex].svendor_id, pciDevs[rowIndex].sdevice_id];
 		case 2:
+			return [NSString stringWithFormat:@"%s", [self vendorString: pciDevs[rowIndex].vendor_id]];
+		case 3:
 			return [NSString stringWithFormat:@"%s", [self deviceString: pciDevs[rowIndex].device_id forVendor:pciDevs[rowIndex].vendor_id]];
 		default:
 			break;
@@ -542,7 +548,7 @@ void enumprops(CFTypeRef object)
     int i=0;
     NSMutableArray *pciids = [NSMutableArray array];
     while(pciDevs[i].device_id!=0){
-        [pciids addObject:[NSString stringWithFormat:@"id[]=%04X,%04X,%06X",pciDevs[i].vendor_id,pciDevs[i].device_id,pciDevs[i].device_class]];i++;
+        [pciids addObject:[NSString stringWithFormat:@"id[]=%04X,%04X,%04X,%04X,%06X",pciDevs[i].vendor_id,pciDevs[i].device_id,pciDevs[i].svendor_id,pciDevs[i].sdevice_id,pciDevs[i].device_class]];i++;
     }
     NSString *postData = [pciids componentsJoinedByString:@"&"];
     NSURL   *url = [NSURL URLWithString:@"http://dpcimanager.sourceforge.net/receiver"];
