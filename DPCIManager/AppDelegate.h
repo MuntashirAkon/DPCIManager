@@ -7,18 +7,25 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "Tables.h"
+#import <IOKit/kext/KextManager.h>
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet NSToolbarItem *submitButton;
 @property NSString *file;
-@property NSArray *pcis;
-@property NSDictionary *vendors;
-@property NSDictionary *classes;
+@property NSString *pciFormat;
+@property NSMutableArray *pcis;
+@property NSMutableDictionary *status;
+@property NSMutableDictionary *vendors;
+@property NSMutableDictionary *classes;
 
 -(IBAction)update:(id)sender;
 -(IBAction)submit:(id)sender;
+-(IBAction)dumpTables:(id)sender;
+-(IBAction)dumpDsdt:(id)sender;
+-(IBAction)fetchKext:(id)sender;
 
 @end
 
@@ -31,13 +38,16 @@
 @property NSNumber *pciClassCode;
 @property NSNumber *pciClass;
 @property NSNumber *pciSubClass;
-@property (nonatomic) NSString *vendorString;
-@property (nonatomic) NSString *deviceString;
-@property (nonatomic) NSString *classString;
-@property (nonatomic) NSString *subClassString;
+@property NSString *vendorString;
+@property NSString *deviceString;
+@property NSString *classString;
+@property NSString *subClassString;
 @property (nonatomic) NSString *fullClassString;
 
++(NSNumber *)grabEntry:(CFStringRef)entry forService:(io_service_t)service;
++(NSDictionary *)match:(pciDevice *)pci;
 +(pciDevice *)create:(io_service_t)service;
+-(NSString *)fullClassString;
 
 @end
 
