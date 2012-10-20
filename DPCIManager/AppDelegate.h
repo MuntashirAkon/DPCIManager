@@ -9,62 +9,42 @@
 #import <Cocoa/Cocoa.h>
 #import "Tables.h"
 #import <IOKit/kext/KextManager.h>
+#import "PCI.h"
+#import "Match.h"
+#import "Task.h"
+#define kSLE @"/System/Library/Extensions"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
-@property (assign) IBOutlet NSWindow *window;
-@property (assign) IBOutlet NSToolbarItem *submitButton;
+@property (assign) IBOutlet NSPanel *panel;
+@property (assign) IBOutlet NSPopover *pop;
+@property Match *match;
+@property NSArray *matches;
 @property NSString *file;
 @property NSString *pciFormat;
-@property NSMutableArray *pcis;
-@property NSMutableDictionary *status;
-@property NSMutableDictionary *vendors;
-@property NSMutableDictionary *classes;
+@property NSString *patch;
+@property NSTask *watcher;
+@property NSMutableArray *log;
+@property NSArray *pcis;
+@property NSDictionary *status;
 
--(IBAction)update:(id)sender;
++(void)modalErrorWithDict:(NSDictionary *)err;
++(void)modalError:(NSError *)err;
+
+-(IBAction)updateIDs:(id)sender;
+-(IBAction)updateSeed:(id)sender;
 -(IBAction)submit:(id)sender;
 -(IBAction)dumpTables:(id)sender;
 -(IBAction)dumpDsdt:(id)sender;
 -(IBAction)fetchKext:(id)sender;
+-(IBAction)patchNode:(id)sender;
+-(IBAction)msrDumper:(id)sender;
+-(IBAction)repair:(id)sender;
+-(IBAction)rebuild:(id)sender;
+-(IBAction)install:(id)sender;
+-(IBAction)fetchCMOS:(id)sender;
+-(IBAction)readROM:(id)sender;
+-(IBAction)writeROM:(id)sender;
+-(IBAction)testROM:(id)sender;
 
-@end
-
-@interface pciDevice : NSObject
-
-@property NSNumber *vendor;
-@property NSNumber *device;
-@property NSNumber *subVendor;
-@property NSNumber *subDevice;
-@property NSNumber *pciClassCode;
-@property NSNumber *pciClass;
-@property NSNumber *pciSubClass;
-@property NSString *vendorString;
-@property NSString *deviceString;
-@property NSString *classString;
-@property NSString *subClassString;
-@property (nonatomic) NSString *fullClassString;
-
-+(NSNumber *)grabEntry:(CFStringRef)entry forService:(io_service_t)service;
-+(NSDictionary *)match:(pciDevice *)pci;
-+(pciDevice *)create:(io_service_t)service;
--(NSString *)fullClassString;
-
-@end
-
-@interface pciVendor : NSObject
-@property NSString *name;
-@property NSMutableDictionary *devices;
-+(pciVendor *)create:(NSString *)name;
-@end
-
-@interface pciClass : NSObject
-@property NSString *name;
-@property NSMutableDictionary *subClasses;
-+(pciClass *)create:(NSString *)name;
-@end
-
-@interface hexFormatter : NSValueTransformer
-+(BOOL)allowsReverseTransformation;
-+(Class)transformedValueClass;
--(id)transformedValue:(id)value;
 @end
