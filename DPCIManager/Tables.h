@@ -58,6 +58,7 @@
 #define HDA_CODEC_ALC888			HDA_CODEC_CONSTRUCT(REALTEK, 0x0888)
 #define HDA_CODEC_ALC889			HDA_CODEC_CONSTRUCT(REALTEK, 0x0889)
 #define HDA_CODEC_ALC892			HDA_CODEC_CONSTRUCT(REALTEK, 0x0892)
+#define HDA_CODEC_ALC898			HDA_CODEC_CONSTRUCT(REALTEK, 0x0899)
 #define HDA_CODEC_ALCXXXX			HDA_CODEC_CONSTRUCT(REALTEK, 0xffff)
 
 /* Analog Devices */
@@ -240,6 +241,8 @@
 #define HDA_CODEC_INTELG45_4		HDA_CODEC_CONSTRUCT(INTEL, 0x2804)
 #define HDA_CODEC_INTELG45_5		HDA_CODEC_CONSTRUCT(INTEL, 0x29fb)
 #define HDA_CODEC_INTELQ57			HDA_CODEC_CONSTRUCT(INTEL, 0x0054)
+#define HDA_CODEC_INTELHD3			HDA_CODEC_CONSTRUCT(INTEL, 0x2805)
+#define HDA_CODEC_INTELHD4			HDA_CODEC_CONSTRUCT(INTEL, 0x2806)
 #define HDA_CODEC_INTELXXXX			HDA_CODEC_CONSTRUCT(INTEL, 0xffff)
 
 static const struct {UInt32 id; char *name;} gCodecList[] = {
@@ -270,6 +273,7 @@ static const struct {UInt32 id; char *name;} gCodecList[] = {
 	{ HDA_CODEC_ALC888,			"Realtek ALC888" },
 	{ HDA_CODEC_ALC889,			"Realtek ALC889" },
 	{ HDA_CODEC_ALC892,			"Realtek ALC892" },
+  	{ HDA_CODEC_ALC898,			"Realtek ALC898" },
 	{ HDA_CODEC_AD1882,			"Analog Devices AD1882" },
 	{ HDA_CODEC_AD1882A,		"Analog Devices AD1882A" },
 	{ HDA_CODEC_AD1883,			"Analog Devices AD1883" },
@@ -406,6 +410,8 @@ static const struct {UInt32 id; char *name;} gCodecList[] = {
 	{ HDA_CODEC_INTELG45_4,		"Intel G45 HDMI" },
 	{ HDA_CODEC_INTELG45_5,		"Intel G45 HDMI" },
 	{ HDA_CODEC_INTELQ57,		"Intel Q57 HDMI" },
+    { HDA_CODEC_INTELHD3,		"Intel HD 3k HDMI" },
+    { HDA_CODEC_INTELHD4,		"Intel HD 4k HDMI" },
 	{ HDA_CODEC_SII1390,		"Silicon Image SiI1390 HDMI" },
 	{ HDA_CODEC_SII1392,		"Silicon Image SiI1392 HDMI" },
 	/* Unknown codec */
