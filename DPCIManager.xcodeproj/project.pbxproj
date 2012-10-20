@@ -15,7 +15,26 @@
 		B025716816018CF000B0E1EB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025716716018CF000B0E1EB /* IOKit.framework */; };
 		B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */ = {isa = PBXBuildFile; fileRef = B025716916018D0600B0E1EB /* DPCIManager.icns */; };
 		B025716C16018D9600B0E1EB /* pci.ids in Resources */ = {isa = PBXBuildFile; fileRef = B025716B16018D9600B0E1EB /* pci.ids */; };
+		B05AE9BC162A500B005190E4 /* Task.m in Sources */ = {isa = PBXBuildFile; fileRef = B05AE9BB162A500B005190E4 /* Task.m */; };
+		B07193831623B776006D5666 /* PCI.m in Sources */ = {isa = PBXBuildFile; fileRef = B07193821623B776006D5666 /* PCI.m */; };
+		B08396ED1627F137003427F4 /* Match.m in Sources */ = {isa = PBXBuildFile; fileRef = B08396EC1627F137003427F4 /* Match.m */; };
+		B0970F0C1628CB8600C1AB8A /* seed.plist in Resources */ = {isa = PBXBuildFile; fileRef = B0970F0B1628CB8600C1AB8A /* seed.plist */; };
+		B0B996A8162B678500EA1285 /* DirectHW.kext in Resources */ = {isa = PBXBuildFile; fileRef = B0B996A7162B678500EA1285 /* DirectHW.kext */; };
+		B0B996AC162B681F00EA1285 /* flashrom in CopyFiles */ = {isa = PBXBuildFile; fileRef = B0B996A9162B680E00EA1285 /* flashrom */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B0B996AB162B681700EA1285 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				B0B996AC162B681F00EA1285 /* flashrom in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B025713B1601496400B0E1EB /* DPCIManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DPCIManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -35,6 +54,15 @@
 		B025716B16018D9600B0E1EB /* pci.ids */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pci.ids; sourceTree = SOURCE_ROOT; };
 		B051DE22160682A4005CC4B6 /* Tables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tables.h; sourceTree = "<group>"; };
 		B051DE2416068316005CC4B6 /* License.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = License.h; sourceTree = "<group>"; };
+		B05AE9BA162A500B005190E4 /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
+		B05AE9BB162A500B005190E4 /* Task.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Task.m; sourceTree = "<group>"; };
+		B07193811623B776006D5666 /* PCI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PCI.h; sourceTree = "<group>"; };
+		B07193821623B776006D5666 /* PCI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PCI.m; sourceTree = "<group>"; };
+		B08396EB1627F137003427F4 /* Match.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Match.h; sourceTree = "<group>"; };
+		B08396EC1627F137003427F4 /* Match.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Match.m; sourceTree = "<group>"; };
+		B0970F0B1628CB8600C1AB8A /* seed.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = seed.plist; sourceTree = SOURCE_ROOT; };
+		B0B996A7162B678500EA1285 /* DirectHW.kext */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.kernel-extension"; name = DirectHW.kext; path = ../DirectHW.kext; sourceTree = "<group>"; };
+		B0B996A9162B680E00EA1285 /* flashrom */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flashrom; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,9 +120,15 @@
 			children = (
 				B02571511601496400B0E1EB /* AppDelegate.h */,
 				B02571521601496400B0E1EB /* AppDelegate.m */,
+				B08396EB1627F137003427F4 /* Match.h */,
+				B08396EC1627F137003427F4 /* Match.m */,
 				B051DE22160682A4005CC4B6 /* Tables.h */,
 				B051DE2416068316005CC4B6 /* License.h */,
 				B02571541601496400B0E1EB /* MainMenu.xib */,
+				B07193811623B776006D5666 /* PCI.h */,
+				B07193821623B776006D5666 /* PCI.m */,
+				B05AE9BA162A500B005190E4 /* Task.h */,
+				B05AE9BB162A500B005190E4 /* Task.m */,
 				B02571461601496400B0E1EB /* Supporting Files */,
 			);
 			path = DPCIManager;
@@ -103,8 +137,11 @@
 		B02571461601496400B0E1EB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				B0970F0B1628CB8600C1AB8A /* seed.plist */,
 				B02571471601496400B0E1EB /* DPCIManager-Info.plist */,
 				B02571481601496400B0E1EB /* InfoPlist.strings */,
+				B0B996A9162B680E00EA1285 /* flashrom */,
+				B0B996A7162B678500EA1285 /* DirectHW.kext */,
 				B025716916018D0600B0E1EB /* DPCIManager.icns */,
 				B025716B16018D9600B0E1EB /* pci.ids */,
 				B025714B1601496400B0E1EB /* main.m */,
@@ -123,6 +160,7 @@
 				B02571371601496300B0E1EB /* Sources */,
 				B02571381601496300B0E1EB /* Frameworks */,
 				B02571391601496300B0E1EB /* Resources */,
+				B0B996AB162B681700EA1285 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -168,6 +206,8 @@
 				B02571561601496400B0E1EB /* MainMenu.xib in Resources */,
 				B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */,
 				B025716C16018D9600B0E1EB /* pci.ids in Resources */,
+				B0970F0C1628CB8600C1AB8A /* seed.plist in Resources */,
+				B0B996A8162B678500EA1285 /* DirectHW.kext in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,6 +220,9 @@
 			files = (
 				B025714C1601496400B0E1EB /* main.m in Sources */,
 				B02571531601496400B0E1EB /* AppDelegate.m in Sources */,
+				B07193831623B776006D5666 /* PCI.m in Sources */,
+				B08396ED1627F137003427F4 /* Match.m in Sources */,
+				B05AE9BC162A500B005190E4 /* Task.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,8 +257,8 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_MARKETING_VERSION = 0.9;
-				CURRENT_PROJECT_VERSION = 88;
+				CURRENT_MARKETING_VERSION = 1.1;
+				CURRENT_PROJECT_VERSION = 134;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -244,8 +287,8 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_MARKETING_VERSION = 0.9;
-				CURRENT_PROJECT_VERSION = 88;
+				CURRENT_MARKETING_VERSION = 1.1;
+				CURRENT_PROJECT_VERSION = 134;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
