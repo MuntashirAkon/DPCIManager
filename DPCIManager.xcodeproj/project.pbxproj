@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B02571401601496400B0E1EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025713F1601496400B0E1EB /* Cocoa.framework */; };
-		B025714A1601496400B0E1EB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B02571481601496400B0E1EB /* InfoPlist.strings */; };
 		B025714C1601496400B0E1EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B025714B1601496400B0E1EB /* main.m */; };
 		B02571531601496400B0E1EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B02571521601496400B0E1EB /* AppDelegate.m */; };
 		B02571561601496400B0E1EB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B02571541601496400B0E1EB /* MainMenu.xib */; };
@@ -43,7 +42,6 @@
 		B02571431601496400B0E1EB /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		B02571441601496400B0E1EB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B02571471601496400B0E1EB /* DPCIManager-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DPCIManager-Info.plist"; sourceTree = "<group>"; };
-		B02571491601496400B0E1EB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B025714B1601496400B0E1EB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B025714D1601496400B0E1EB /* DPCIManager-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DPCIManager-Prefix.pch"; sourceTree = "<group>"; };
 		B02571511601496400B0E1EB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -139,7 +137,6 @@
 			children = (
 				B0970F0B1628CB8600C1AB8A /* seed.plist */,
 				B02571471601496400B0E1EB /* DPCIManager-Info.plist */,
-				B02571481601496400B0E1EB /* InfoPlist.strings */,
 				B0B996A9162B680E00EA1285 /* flashrom */,
 				B0B996A7162B678500EA1285 /* DirectHW.kext */,
 				B025716916018D0600B0E1EB /* DPCIManager.icns */,
@@ -161,6 +158,7 @@
 				B02571381601496300B0E1EB /* Frameworks */,
 				B02571391601496300B0E1EB /* Resources */,
 				B0B996AB162B681700EA1285 /* CopyFiles */,
+				B025E90416334453009D5FA6 /* Increment Build Number */,
 			);
 			buildRules = (
 			);
@@ -202,7 +200,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B025714A1601496400B0E1EB /* InfoPlist.strings in Resources */,
 				B02571561601496400B0E1EB /* MainMenu.xib in Resources */,
 				B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */,
 				B025716C16018D9600B0E1EB /* pci.ids in Resources */,
@@ -212,6 +209,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B025E90416334453009D5FA6 /* Increment Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Increment Build Number";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "CPV=$[ CURRENT_PROJECT_VERSION+1 ]\nsed -i '' \"s/CURRENT_PROJECT_VERSION = $CURRENT_PROJECT_VERSION/CURRENT_PROJECT_VERSION = $CPV/\" $PROJECT_NAME.xcodeproj/project.pbxproj";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B02571371601496300B0E1EB /* Sources */ = {
@@ -229,14 +244,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		B02571481601496400B0E1EB /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B02571491601496400B0E1EB /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		B02571541601496400B0E1EB /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -258,7 +265,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_MARKETING_VERSION = 1.1;
-				CURRENT_PROJECT_VERSION = 134;
+				CURRENT_PROJECT_VERSION = 140;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -288,7 +295,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_MARKETING_VERSION = 1.1;
-				CURRENT_PROJECT_VERSION = 134;
+				CURRENT_PROJECT_VERSION = 140;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
