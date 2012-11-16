@@ -541,7 +541,7 @@
 #pragma mark Logging
 -(void)readLog:(NSData *)data{
     [self willChangeValueForKey:@"log"];
-    for (NSString *line in [[NSString stringWithUTF8String:[data bytes]] componentsSeparatedByString:@"\n"]) {
+    for (NSString *line in [[[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"]) {
         if ([line rangeOfString:@"MSRDumper"].location != NSNotFound || [line rangeOfString:@"kextd"].location != NSNotFound || [line rangeOfString:@"kextcache"].location != NSNotFound || [line rangeOfString:@"DirectHW"].location != NSNotFound || [line rangeOfString:@"Repair Permissions"].location != NSNotFound)
             [log insertObject:@{@"timestamp":[NSDate date],@"entry":[line substringFromIndex:[line rangeOfString:@" " options:0 range:NSMakeRange(16, [line length]-16)].location+1]} atIndex:0];
     }
@@ -549,7 +549,7 @@
 }
 -(void)logTask:(NSData *)data{
     [self willChangeValueForKey:@"log"];
-    for (NSString *line in [[NSString stringWithUTF8String:[data bytes]] componentsSeparatedByString:@"\n"]) {
+    for (NSString *line in [[[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"]) {
         if ([line length] > 0)
         [log insertObject:@{@"timestamp":[NSDate date],@"entry":line} atIndex:0];
     }
