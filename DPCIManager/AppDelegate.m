@@ -215,6 +215,11 @@
             IORegistryEntryGetName(service, name);
             IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
             model = (CFStringRef)IORegistryEntryCreateCFProperty(parent, CFSTR("IOModel"), kCFAllocatorDefault, 0);
+            if (model == nil) {
+                IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
+                IORegistryEntryGetName(parent, name);
+                model = (__bridge CFStringRef)(@(name));
+            }
             builtin = (CFBooleanRef)IORegistryEntryCreateCFProperty(service, CFSTR("IOBuiltin"), kCFAllocatorDefault, 0);
             [temp addObject:@{@"model":(__bridge NSString *)model,@"bsd":@(name),@"builtin":(__bridge NSNumber*)builtin}];
             CFRelease(model);
