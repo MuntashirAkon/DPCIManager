@@ -242,13 +242,17 @@
                 mach_vm_address_t address;
                 mach_vm_size_t size;
                 if(IOConnectMapMemory64(connect, 0x2000, mach_task_self(), &address, &size, kIOMapAnywhere|kIOMapDefaultCache)==KERN_SUCCESS){
-                    long codecid;
-                    char *codecname = NULL;
-                    codecid = CODEC_ID(strtol(strstr((char *)address,"Vendor: ")+8, NULL, 16),strtol(strstr((char *)address,"Device: ")+8, NULL, 16));
-                    for(int n = 0; gCodecList[n].name; n++)
-                        if(HDA_DEV_MATCH(gCodecList[n].id, codecid)) { codecname = gCodecList[n].name; break; }
-                    if(codecname==NULL) codecname = (codecid==0) ? "NULL Codec" : "Unknown Codec";
-                    [temp addObject:@{@"device":[NSString stringWithFormat:pciFormat, [audio.vendor integerValue], [audio.device integerValue]], @"subdevice":[NSString stringWithFormat:pciFormat, [audio.subVendor integerValue], [audio.subDevice integerValue]], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"model":[NSString stringWithUTF8String:codecname]}];
+                    __block NSMutableArray *hda = [NSMutableArray array];
+                    NSString *dump = [[NSString alloc] initWithBytes:(const void *)address length:size encoding:NSUTF8StringEncoding];
+                    [[NSRegularExpression regularExpressionWithPattern:@"Codec ID: 0x([0-9a-f]{8})" options:0 error:nil] enumerateMatchesInString:dump options:0 range:NSMakeRange(0, [dump length]) usingBlock:^void(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop){
+                        long codecid = strtol([[dump substringWithRange:[result rangeAtIndex:1]] UTF8String], NULL, 16);
+                        char *codecname = NULL;
+                        for(int n = 0; gCodecList[n].name; n++)
+                            if(HDA_DEV_MATCH(gCodecList[n].id, codecid)) { codecname = gCodecList[n].name; break; }
+                        if(codecname==NULL) codecname = (codecid==0) ? "NULL Codec" : "Unknown Codec";
+                        [hda addObject:@{@"device":[NSString stringWithFormat:pciFormat, [audio.vendor integerValue], [audio.device integerValue]], @"subdevice":[NSString stringWithFormat:pciFormat, [audio.subVendor integerValue], [audio.subDevice integerValue]], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"model":[NSString stringWithUTF8String:codecname]}];
+                    }];
+                    temp = hda;
                     IOConnectUnmapMemory64(connect, 0x2000, mach_task_self(), address);
                 }
                 IOServiceClose(connect);
