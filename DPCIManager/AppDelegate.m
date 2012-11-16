@@ -297,7 +297,7 @@
             if((service = IOServiceGetMatchingService(kIOMasterPortDefault, CFDictionaryCreateCopy(kCFAllocatorDefault,(__bridge CFDictionaryRef)[pciDevice match:pci])))){
                 io_connect_t connect;
                 if(IOServiceOpen(service, mach_task_self(), 0, &connect)==KERN_SUCCESS){
-                    //TODO: Map Memory
+                    //FIXME: Map Memory
                     IOServiceClose(connect);
                 }
                 else [temp addObject:@{@"device":matchString, @"subdevice":[NSString stringWithFormat:pciFormat, [pci.subVendor integerValue], [pci.subDevice integerValue]], @"codecid":@"", @"model":@""}];
@@ -473,7 +473,7 @@
 }
 -(IBAction)repair:(id)sender{
     [sender setEnabled:false];
-    [panel makeKeyAndOrderFront:sender];//TODO: more efficient process
+    [panel makeKeyAndOrderFront:sender];//FIXME: more efficient process
     [AScript adminExec:[NSString stringWithFormat:@"function log() { /usr/bin/syslog -s -k Sender 'Repair Permissions' -k Level 5 -k Message \\\"$1\\\"; };/bin/chmod -RN %@;log 'Finished chmod N';/usr/bin/find %@ -type d -print0 | /usr/bin/xargs -0 /bin/chmod 0755;log 'Finished chmod D';/usr/bin/find %@ -type f -print0 | /usr/bin/xargs -0 /bin/chmod 0644;log 'Finished chmod F';/usr/sbin/chown -R 0:0 %@;log 'Finished chown';/usr/bin/xattr -cr %@;log 'Finished xattr';log 'Finished repair'", kSLE, kSLE, kSLE, kSLE, kSLE]];
     [sender setEnabled:true];
 }
