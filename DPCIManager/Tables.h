@@ -288,7 +288,7 @@ static const struct {UInt32 id; char *name;} gCodecList[] = {
 	{ HDA_CODEC_AD1987,			"Analog Devices AD1987" },
 	{ HDA_CODEC_AD1988,			"Analog Devices AD1988A" },
 	{ HDA_CODEC_AD1988B,		"Analog Devices AD1988B" },
-    { HDA_CODEC_AD1989B,        "Analog Devices AD2000b" },//Added
+    { HDA_CODEC_AD1989B,        "Analog Devices AD2000b" },
 	{ HDA_CODEC_CMI9880,		"CMedia CMI9880" },
 	{ HDA_CODEC_CXD9872RDK,		"Sigmatel CXD9872RD/K" },
 	{ HDA_CODEC_CXD9872AKD,		"Sigmatel CXD9872AKD" },
