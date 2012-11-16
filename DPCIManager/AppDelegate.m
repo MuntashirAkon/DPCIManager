@@ -16,6 +16,7 @@
 @synthesize nodeLocation;
 @synthesize file;
 @synthesize patch;
+@synthesize bdmesg;
 @synthesize pciFormat;
 @synthesize pcis;
 @synthesize status;
@@ -75,6 +76,18 @@
     CFRelease(dict);
     return check;
 }
++(NSString *)bdmesg{
+    io_service_t expert;
+    NSString *log = @"Install Chimera to enable boot-log";
+    if((expert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice")))){
+        CFDataRef data = IORegistryEntryCreateCFProperty(expert, CFSTR("boot-log"), kCFAllocatorDefault, 0);
+        if (data != nil){;
+            log = [[NSString alloc] initWithBytes:CFDataGetBytePtr(data) length:CFDataGetLength(data) encoding:NSASCIIStringEncoding];
+            CFRelease(data);
+        }
+    }
+    return log;
+}
 
 #pragma mark ApplicationDelegate
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification{
@@ -86,6 +99,9 @@
     [self didChangeValueForKey:@"patch"];
     watcher = [NSTask create:@"/usr/bin/tail" args:@[@"-n", @"0", @"-f", @"/var/log/system.log"] callback:@selector(readLog:) listener:self];
     log = [NSMutableArray array];
+    [self willChangeValueForKey:@"bdmesg"];
+    bdmesg = [AppDelegate bdmesg];
+    [self didChangeValueForKey:@"bdmesg"];
     [self willChangeValueForKey:@"pcis"];
     pcis = [pciDevice readIDs];
     [self didChangeValueForKey:@"pcis"];

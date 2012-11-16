@@ -24,6 +24,7 @@
 @property NSString *file;
 @property NSString *pciFormat;
 @property NSString *patch;
+@property NSString *bdmesg;
 @property NSTask *watcher;
 @property NSMutableArray *log;
 @property NSArray *pcis;
