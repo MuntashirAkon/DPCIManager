@@ -39,11 +39,16 @@ static NSArray *matchKeys;
     NSDirectoryEnumerator *iterator = [[NSFileManager defaultManager] enumeratorAtPath:kSLE];
     NSString *path;
     NSDictionary *personalities;
+    NSString *name;
     while ((path = [iterator nextObject]))
         if ([[path lastPathComponent] isEqualToString:@"Info.plist"])
             if ((personalities = [Match personalities:[NSString stringWithFormat:@"%@/%@", kSLE, path]]))
-                for (NSString *personality in personalities)
-                    [kexts setObject:[personalities objectForKey:personality] forKey:[NSString stringWithFormat:@"%@:%@", [self kextNameFromPath:path], personality]];
+                for (NSString *personality in personalities) {
+                    if ((name = [NSString stringWithFormat:@"%@:%@", [self kextNameFromPath:path], personality]) && [kexts objectForKey:name] == nil)
+                    [kexts setObject:[personalities objectForKey:personality] forKey:name];
+                    else
+                        [kexts setObject:[[NSSet setWithArray:[[kexts objectForKey:name] arrayByAddingObjectsFromArray:[personalities objectForKey:personality]]] allObjects] forKey:name];
+                }
     temp.native = [NSDictionary dictionaryWithDictionary:kexts];
     return temp;
 }
@@ -63,8 +68,10 @@ static NSArray *matchKeys;
     return ([dict count]==0)?nil:[NSDictionary dictionaryWithDictionary:dict];
 }
 +(NSString *)kextNameFromPath:(NSString *)path{
-    NSString *temp = [path stringByDeletingLastPathComponent];
-    return [([[[temp lastPathComponent] pathExtension] isEqualToString:@"kext"])?temp:[temp stringByDeletingLastPathComponent] lastPathComponent];
+    for (NSString *component in [path.pathComponents reverseObjectEnumerator])
+        if ([component hasSuffix:@".kext"])
+            return component;
+    return @"";
 }
 +(bool)masked:(pciDevice *)device as:(NSUInteger)type to:(NSString *)masked{
     if (type == kIOPCIMatch) return ([Match masked:device as:kIOPCIPrimaryMatch to:masked] || [Match masked:device as:kIOPCISecondaryMatch to:masked]);
