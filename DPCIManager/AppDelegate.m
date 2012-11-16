@@ -13,6 +13,7 @@
 @implementation AppDelegate
 @synthesize panel;
 @synthesize pop;
+@synthesize nodeLocation;
 @synthesize file;
 @synthesize patch;
 @synthesize pciFormat;
@@ -81,7 +82,7 @@
     file = [[NSBundle mainBundle] pathForResource:@"pci" ofType:@"ids"];
     pciFormat = @"0x%04lX%04lX";
     [self willChangeValueForKey:@"patch"];
-    patch = @"0x01000000";
+    patch = @"0x00000000";
     [self didChangeValueForKey:@"patch"];
     watcher = [NSTask create:@"/usr/bin/tail" args:@[@"-n", @"0", @"-f", @"/var/log/system.log"] callback:@selector(readLog:) listener:self];
     log = [NSMutableArray array];
@@ -463,10 +464,28 @@
 }
 -(IBAction)patchNode:(id)sender{
     [self willChangeValueForKey:@"patch"];
-    if ([sender tag] == 0)
-        patch = [patch stringByReplacingCharactersInRange:NSMakeRange([sender tag]+2, 2) withString:[NSString stringWithFormat:@"%02lX", [[sender selectedItem] tag]]];
+    if ([sender tag] < 2) {
+        NSInteger i = [[patch substringWithRange:NSMakeRange(2, 1)] integerValue]&(0b11<<([sender tag]==0?0:2));
+        i |= [[sender selectedItem] tag]<<([sender tag]==0?2:0);
+        patch = [patch stringByReplacingCharactersInRange:NSMakeRange(2, 1) withString:[NSString stringWithFormat:@"%01lX", i]];
+        if ([sender tag]==1) {
+            i=0;
+            [nodeLocation removeAllItems];
+            for (NSString *choice in [@[@[@"N/A", @"Rear", @"Front", @"Left", @"Right", @"Top", @"Bottom", @"Rear Panel", @"Drive Bay"], @[@"N/A", @"", @"", @"", @"", @"", @"", @"Riser", @"Digital Display", @"ATAPI"], @[@"N/A", @"Rear", @"Front", @"Left", @"Right", @"Top", @"Bottom"], @[@"N/A", @"", @"", @"", @"", @"", @"Bottom", @"Inside Lid", @"Outside Lid"]] objectAtIndex:[[sender selectedItem] tag]]) {
+                if ([choice length] == 0) {
+                    i++;
+                    continue;
+                }
+                NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:choice action:NULL keyEquivalent:@""];
+                [item setTag:i++];
+                [[nodeLocation menu] addItem:item];
+            }
+            [nodeLocation selectItemAtIndex:0];
+            [self patchNode:nodeLocation];
+        }
+    }
     else
-        patch = [patch stringByReplacingCharactersInRange:NSMakeRange([sender tag]+3, 1) withString:[NSString stringWithFormat:@"%lX", [[sender selectedItem] tag]]];
+        patch = [patch stringByReplacingCharactersInRange:NSMakeRange([sender tag]+1, 1) withString:[NSString stringWithFormat:@"%lX", [[sender selectedItem] tag]]];
     [self didChangeValueForKey:@"patch"];
 }
 -(IBAction)msrDumper:(id)sender{

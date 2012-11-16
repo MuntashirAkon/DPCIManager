@@ -18,6 +18,7 @@
 
 @property (assign) IBOutlet NSPanel *panel;
 @property (assign) IBOutlet NSPopover *pop;
+@property (assign) IBOutlet NSPopUpButton *nodeLocation;
 @property Match *match;
 @property NSArray *matches;
 @property NSString *file;
