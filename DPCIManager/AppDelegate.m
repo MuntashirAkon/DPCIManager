@@ -497,21 +497,19 @@
     [sender setEnabled:true];
 }
 -(IBAction)fetchCMOS:(id)sender{
-    uint64_t offset = 0;
-    unsigned long length = 128;
-    unsigned char *buff = calloc(length, 1);
+    NSRange range = NSMakeRange(0, 128);
+    unsigned char buff[range.length];
     io_service_t service;
     if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleRTC")))) {
         io_connect_t connect;
         if(IOServiceOpen(service, mach_task_self(), 0x0101FACE, &connect)==KERN_SUCCESS){
-            if(IOConnectCallMethod(connect, 0, &offset, 1, NULL, 0, NULL, NULL, buff, &length) == KERN_SUCCESS){
-                [NSData dataWithBytes:buff length:length];
+            if(IOConnectCallMethod(connect, 0, (uint64_t *)&range.location, 1, NULL, 0, NULL, NULL, buff, &range.length) == KERN_SUCCESS){
+                [NSData dataWithBytes:buff length:range.length];
             }
             IOServiceClose(connect);
         }
         IOObjectRelease(service);
     }
-    free(buff);
 }
 -(IBAction)readROM:(id)sender{
     if (![AppDelegate checkDirect]) return;
