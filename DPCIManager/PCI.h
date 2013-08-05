@@ -6,10 +6,12 @@
 //  Licensed under GPLv3, full text at http://www.gnu.org/licenses/gpl-3.0.txt
 //
 
-#import <Cocoa/Cocoa.h>
-
 @interface pciDevice : NSObject
 
+@property NSNumber *shadowVendor;
+@property NSNumber *shadowDevice;
+@property NSNumber *revision;
+@property NSArray *bus;
 @property NSNumber *vendor;
 @property NSNumber *device;
 @property NSNumber *subVendor;
@@ -21,17 +23,18 @@
 @property NSString *deviceString;
 @property NSString *classString;
 @property NSString *subClassString;
-@property (nonatomic) NSString *fullClassString;
-@property (nonatomic) long fullID;
-@property (nonatomic) long fullSubID;
+@property (readonly) NSString *fullClassString;
+@property (readonly) NSString *lspciString;
+@property (readonly) long fullID;
+@property (readonly) long fullSubID;
 
-+(NSNumber *)grabEntry:(CFStringRef)entry forService:(io_service_t)service;
++(long)nameToLong:(NSString *)name;
++(bool)isPCI:(io_service_t)service;
++(NSNumber *)grabNumber:(CFStringRef)entry forService:(io_service_t)service;
++(NSString *)grabString:(CFStringRef)entry forService:(io_service_t)service;
 +(NSDictionary *)match:(pciDevice *)pci;
 +(pciDevice *)create:(io_service_t)service classes:(NSMutableDictionary *)classes vendors:(NSMutableDictionary *)vendors;
 +(pciDevice *)create:(io_service_t)service;
--(NSString *)fullClassString;
--(long)fullID;
--(long)fullSubID;
 +(NSArray *)readIDs;
 
 @end
@@ -46,6 +49,13 @@
 @property NSString *name;
 @property NSMutableDictionary *subClasses;
 +(pciClass *)create:(NSString *)name;
+@end
+
+@interface efiObject : NSObject
+@property NSDictionary *properties;
+@property pciDevice *device;
++(efiObject *)create:(pciDevice *)device injecting:(NSDictionary *)properties;
++(NSString *)stringWithArray:(NSArray *)array;
 @end
 
 @interface hexFormatter : NSValueTransformer

@@ -7,7 +7,7 @@
 //
 
 #import "Match.h"
-#import "AppDelegate.h"
+#import "PCI.h"
 
 #define kSeed 100
 #define kNative 101
@@ -29,27 +29,27 @@ static NSArray *matchKeys;
 @synthesize native;
 
 +(void)initialize{
-    matchKeys = @[@"IOPCIMatch", @"IOPCIPrimaryMatch", @"IOPCISecondaryMatch", @"IOPCIClassMatch",//PCI
+    matchKeys = @[@"IOPCIMatch", @"IOPCIPrimaryMatch", @"IOPCISecondaryMatch", @"IOPCIClassMatch", //PCI
     @"IOPropertyMatch", @"IONameMatch", @"IOResourceMatch", @"IOParentMatch", @"IOPathMatch"/*, @"IOProviderClass"*/];//OF
 }
 +(Match *)create{
     Match *temp = [Match new];
-    temp.seed = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"seed" ofType:@"plist"]];
+    temp.seed = [NSDictionary dictionaryWithContentsOfFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]];
     NSMutableDictionary *kexts = [NSMutableDictionary dictionary];
-    NSDirectoryEnumerator *iterator = [[NSFileManager defaultManager] enumeratorAtPath:kSLE];
+    NSDirectoryEnumerator *iterator = [NSFileManager.defaultManager enumeratorAtPath:kSLE];
     NSString *path;
     NSDictionary *personalities;
     NSString *name;
-    while ((path = [iterator nextObject]))
-        if ([[path lastPathComponent] isEqualToString:@"Info.plist"])
+    while ((path = iterator.nextObject))
+        if ([path.lastPathComponent isEqualToString:@"Info.plist"])
             if ((personalities = [Match personalities:[NSString stringWithFormat:@"%@/%@", kSLE, path]]))
                 for (NSString *personality in personalities) {
-                    if ((name = [NSString stringWithFormat:@"%@:%@", [self kextNameFromPath:path], personality]) && [kexts objectForKey:name] == nil)
+                    if ((name = [NSString stringWithFormat:@"%@:%@", [self kextNameFromPath:path], personality]) && ![kexts objectForKey:name])
                     [kexts setObject:[personalities objectForKey:personality] forKey:name];
                     else
                         [kexts setObject:[[NSSet setWithArray:[[kexts objectForKey:name] arrayByAddingObjectsFromArray:[personalities objectForKey:personality]]] allObjects] forKey:name];
                 }
-    temp.native = [NSDictionary dictionaryWithDictionary:kexts];
+    temp.native = [kexts copy];
     return temp;
 }
 +(NSDictionary *)personalities:(NSString *)path{
@@ -63,70 +63,53 @@ static NSArray *matchKeys;
             if (index != NSNotFound)
                 [temp addObject:@{[NSString stringWithFormat:@"%ld", index]:obj}];
         }];
-        if ([temp count] > 0) [dict setObject:[NSArray arrayWithArray:temp] forKey:personality];
+        if (temp.count > 0) [dict setObject:[temp copy] forKey:personality];
     }
-    return ([dict count]==0)?nil:[NSDictionary dictionaryWithDictionary:dict];
+    return !dict.count?nil:[dict copy];
 }
 +(NSString *)kextNameFromPath:(NSString *)path{
-    for (NSString *component in [path.pathComponents reverseObjectEnumerator])
+    for (NSString *component in path.pathComponents.reverseObjectEnumerator)
         if ([component hasSuffix:@".kext"])
             return component;
     return @"";
 }
 +(bool)masked:(pciDevice *)device as:(NSUInteger)type to:(NSString *)masked{
     if (type == kIOPCIMatch) return ([Match masked:device as:kIOPCIPrimaryMatch to:masked] || [Match masked:device as:kIOPCISecondaryMatch to:masked]);
-    long candidate;
     if ([masked rangeOfString:@"&"].location != NSNotFound){
         NSArray *temp = [masked componentsSeparatedByString:@"&"];
-        long mask;
-        sscanf([[temp objectAtIndex:0] UTF8String], "%li", &candidate);
-        sscanf([[temp objectAtIndex:1] UTF8String], "%li", &mask);
+        long candidate = strHexDec([temp objectAtIndex:0]), mask = strHexDec([temp objectAtIndex:1]);
         switch (type) {
             case kIOPCIPrimaryMatch:
-                if ([device.vendor integerValue] != (candidate&0x0000FFFF)) return false;
-                return (([device fullID]&mask) == candidate);
+                if (device.vendor.integerValue != (candidate&0x0000FFFF)) return false;
+                return ((device.fullID&mask) == candidate);
                 break;
             case kIOPCISecondaryMatch:
-                if ([device.subVendor integerValue] != (candidate&0x0000FFFF)) return false;
-                return (([device fullSubID]&mask) == candidate);
+                if (device.subVendor.integerValue != (candidate&0x0000FFFF)) return false;
+                return ((device.fullSubID&mask) == candidate);
                 break;
         }
         return false;
     }
-    else {
-        sscanf([masked UTF8String], "%li", &candidate);
-        return [self PCI:device to:candidate];
-    }
+    else
+        return [self PCI:device to:strHexDec(masked)];
 }
 +(bool)class:(pciDevice *)device to:(NSString *)class{
-    long candidate;
     if ([class rangeOfString:@"&"].location != NSNotFound){
         NSArray *temp = [class componentsSeparatedByString:@"&"];
-        long mask;
-        sscanf([[temp objectAtIndex:0] UTF8String], "%li", &candidate);
-        sscanf([[temp objectAtIndex:1] UTF8String], "%li", &mask);
-        return ((([[device pciClassCode] integerValue]<<8)&mask) == candidate);
+        return (((device.pciClassCode.integerValue<<8)&strHexDec([temp objectAtIndex:1])) == strHexDec([temp objectAtIndex:0]));
     }
     else {
-        sscanf([class UTF8String], "%li", &candidate);
-        return (([[device pciClassCode] integerValue]<<8) == candidate);
+        return ((device.pciClassCode.integerValue<<8) == strHexDec(class));
     }
 }
 +(bool)PCI:(pciDevice *)device to:(NSUInteger)candidate{
     if ([device.vendor integerValue] != (candidate&0x0000FFFF)) return false;
-    return NSLocationInRange((([device fullID]&0xFFFF0000)>>0x10), NSMakeRange(((candidate&0xFFFF0000)>>0x10)-0x8,0x10));
+    return NSLocationInRange(((device.fullID&0xFFFF0000)>>0x10), NSMakeRange(((candidate&0xFFFF0000)>>0x10)-0x8, 0x10));
 }
 +(bool)name:(pciDevice *)device to:(NSString *)candidate{
-    if ([candidate hasPrefix:@"pci"] && [candidate rangeOfString:@","].location != NSNotFound) {
-        NSArray *temp = [[candidate stringByReplacingOccurrencesOfString:@"pci" withString:@","] componentsSeparatedByString:@","];
-        int dev;
-        int ven;
-        sscanf([[temp objectAtIndex:1] UTF8String], "%x", &ven);
-        sscanf([[temp objectAtIndex:2] UTF8String], "%x", &dev);
-        return [self PCI:device to:ven|(dev<<16)];
-    }
+    long ids = [pciDevice nameToLong:candidate];
+    return ids?[self PCI:device to:ids]:false;
     //TODO: more matches
-    return false;
 }
 -(NSArray *)match:(pciDevice *)device{
     return [[NSArray arrayWithArray:[self find:device in:seed as:kSeed]] arrayByAddingObjectsFromArray:[self find:device in:native as:kNative]];
@@ -138,8 +121,8 @@ static NSArray *matchKeys;
     for (NSString *kext in catalogue) {
         NSMutableArray *submatches = [NSMutableArray array];
         for (NSDictionary *match in [catalogue objectForKey:kext]) {
-            for (NSNumber *predicate in [match allKeys]) {
-                switch ([predicate integerValue]) {
+            for (NSNumber *predicate in match.allKeys) {
+                switch (predicate.integerValue) {
                     case kIOPCIMatch:
                     case kIOPCIPrimaryMatch:
                     case kIOPCISecondaryMatch:
@@ -148,24 +131,24 @@ static NSArray *matchKeys;
                             temp = [temp1 componentsSeparatedByString:@" "];
                         else temp = [NSArray arrayWithObject:temp1];
                         for (NSString *submatch in temp)
-                            if ([Match masked:device as:[predicate integerValue] to:submatch])
-                                [submatches addObject:@{@"type":@([predicate integerValue]), @"name":submatch}];
+                            if ([Match masked:device as:predicate.integerValue to:submatch])
+                                [submatches addObject:@{@"type":predicate, @"name":submatch}];
                         break;
                     case kIOPCIClassMatch:
                         if ([Match class:device to:[match objectForKey:predicate]])
-                            [submatches addObject:@{@"type":@([predicate integerValue]), @"name":[match objectForKey:predicate]}];
+                            [submatches addObject:@{@"type":predicate, @"name":[match objectForKey:predicate]}];
                     case kIONameMatch:
                         if (![[match objectForKey:predicate] isKindOfClass:[NSArray class]])
                             temp = [NSArray arrayWithObject:[match objectForKey:predicate]];
                         else temp = [match objectForKey:predicate];
                         for (NSString *submatch in temp)
                             if ([Match name:device to:submatch])
-                                [submatches addObject:@{@"type":@([predicate integerValue]), @"name":submatch}];
+                                [submatches addObject:@{@"type":predicate, @"name":submatch}];
                         break;
                 }
             }
         }
-        if ([submatches count] == [[catalogue objectForKey:kext] count]) [matches addObject:@{@"type":@(type), @"name":kext, @"children":[NSArray arrayWithArray:submatches]}];
+        if (submatches.count == [[catalogue objectForKey:kext] count]) [matches addObject:@{@"type":@(type), @"name":kext, @"children":[submatches copy]}];
     }
     return matches;
 }
@@ -180,7 +163,7 @@ static NSArray *matchKeys;
     return [NSImage class];
 }
 -(id)transformedValue:(id)value {
-    if (value == nil) return nil;
+    if (!value) return nil;
     switch ([value integerValue]){
         case kSeed:
             return [NSImage imageNamed:NSImageNameNetwork];

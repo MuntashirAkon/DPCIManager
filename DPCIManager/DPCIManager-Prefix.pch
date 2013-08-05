@@ -5,3 +5,25 @@
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
+#define kSLE @"/System/Library/Extensions"
+#define SHOWFILE(x) [[NSWorkspace sharedWorkspace] selectFile:x inFileViewerRootedAtPath:x.stringByDeletingLastPathComponent]
+#define assignWithNotice(x,y,z) [x willChangeValueForKey:@""#y];y=z;[x didChangeValueForKey:@""#y];
+#define muteWithNotice(x,y,z) [x willChangeValueForKey:@""#y];z;[x didChangeValueForKey:@""#y];
+#define strHexDec(x) strtol([x UTF8String], NULL, 16)
+NS_INLINE NSError* ModalError(NSError *error){
+    if (error)
+        [[NSAlert alertWithError:error] runModal];
+    return error;
+}
+NS_INLINE void ModalErrorWithDict(NSDictionary *err){
+    if (err && [[err objectForKey:NSAppleScriptErrorNumber] integerValue] != -128)
+        NSRunCriticalAlertPanel([err objectForKey:NSAppleScriptErrorMessage], [err objectForKey:NSAppleScriptErrorBriefMessage], nil, nil, nil);
+}
+NS_INLINE NSOpenPanel* DirectoryChooser() {
+    NSOpenPanel *temp = [NSOpenPanel openPanel];
+    [temp setCanChooseDirectories:true];
+    [temp setCanChooseFiles:false];
+    [temp setCanCreateDirectories:true];
+    [temp setPrompt:@"Choose a destination folder"];
+    return temp;
+}

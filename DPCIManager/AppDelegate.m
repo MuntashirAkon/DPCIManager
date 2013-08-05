@@ -7,395 +7,97 @@
 //
 
 #import "AppDelegate.h"
-#define kDirectHWIdentifier @"com.coresystems.driver.DirectHW"
-#define kOSBundleStarted @"OSBundleStarted"
+#import "PCI.h"
+#import "Task.h"
+#import "Hardware.h"
+#import "Match.h"
 
 @implementation AppDelegate
 @synthesize panel;
 @synthesize pop;
 @synthesize nodeLocation;
-@synthesize file;
 @synthesize patch;
 @synthesize bdmesg;
-@synthesize pciFormat;
 @synthesize pcis;
 @synthesize status;
 @synthesize watcher;
+@synthesize cond;
 @synthesize log;
 @synthesize match;
 @synthesize matches;
-
-#pragma mark Class Methods
-+(void)modalErrorWithDict:(NSDictionary *)err{//TODO: add chimera/chameleon validator?
-    if (err != nil)
-        [[NSAlert alertWithError:[NSError errorWithDomain:NSCocoaErrorDomain code:[[err objectForKey:NSAppleScriptErrorNumber] integerValue] userInfo:@{NSLocalizedDescriptionKey:[err objectForKey:NSAppleScriptErrorMessage], NSLocalizedRecoverySuggestionErrorKey:[err objectForKey:NSAppleScriptErrorBriefMessage]}]] runModal];
-}
-+(void)modalError:(NSError *)err{
-    if (err != nil)
-        [[NSAlert alertWithError:err] runModal];
-}
-+(void)acpitables:(CFStringRef)only{
-    io_service_t expert;
-    if((expert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleACPIPlatformExpert")))){
-        NSOpenPanel *open = [NSOpenPanel openPanel];
-        [open setCanChooseDirectories:true];
-        [open setCanChooseFiles:false];
-        [open setPrompt:@"Choose a destination folder"];
-        [open setCanCreateDirectories:true];
-        if([open runModal] == NSFileHandlingPanelOKButton) {
-            CFDictionaryRef tables = (CFDictionaryRef)IORegistryEntryCreateCFProperty(expert, CFSTR("ACPI Tables"), kCFAllocatorDefault, 0);
-            CFDataRef table;
-            if(only==nil){
-                CFIndex count = CFDictionaryGetCount(tables);
-                CFStringRef *keys = NSZoneCalloc(nil, count, sizeof(id));
-                NSInteger i = 0;
-                CFDictionaryGetKeysAndValues(tables, (const void **)keys, NULL);
-                while(i<count) {
-                    table = (CFDataRef)CFDictionaryGetValue(tables, keys[i]);
-                    [[NSFileManager defaultManager] createFileAtPath:[NSString stringWithFormat:@"%@/%@.aml", [[[open URLs] objectAtIndex:0] path], keys[i++]] contents:(__bridge NSData *)table attributes:0];
-                }
-                NSZoneFree(nil, keys);
-            }
-            else {
-                table = (CFDataRef)CFDictionaryGetValue(tables, only);
-                [[NSFileManager defaultManager] createFileAtPath:[NSString stringWithFormat:@"%@/%@.aml", [[[open URLs] objectAtIndex:0] path], only] contents:(__bridge NSData *)table attributes:0];
-            }
-            CFRelease(tables);
-        }
-        IOObjectRelease(expert);
-    }
-}
-+(bool)checkDirect{
-    CFDictionaryRef dict = KextManagerCopyLoadedKextInfo((__bridge CFArrayRef)@[kDirectHWIdentifier], (__bridge CFArrayRef)@[kOSBundleStarted]);
-    bool check = [[[(__bridge NSDictionary *)dict objectForKey:kDirectHWIdentifier] objectForKey:kOSBundleStarted] boolValue];
-    CFRelease(dict);
-    if (check) return true;
-    [AScript loadKext:[[NSBundle mainBundle] pathForResource:@"DirectHW" ofType:@"kext"]];
-    dict = KextManagerCopyLoadedKextInfo((__bridge CFArrayRef)@[kDirectHWIdentifier], (__bridge CFArrayRef)@[kOSBundleStarted]);
-    check = [[[(__bridge NSDictionary *)dict objectForKey:kDirectHWIdentifier] objectForKey:kOSBundleStarted] boolValue];
-    CFRelease(dict);
-    return check;
-}
-+(NSString *)bdmesg{
-    io_service_t expert;
-    NSString *log = @"Install Chimera to enable boot-log";
-    if((expert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice")))){
-        CFDataRef data = IORegistryEntryCreateCFProperty(expert, CFSTR("boot-log"), kCFAllocatorDefault, 0);
-        if (data != nil){;
-            log = [[NSString alloc] initWithBytes:CFDataGetBytePtr(data) length:CFDataGetLength(data) encoding:NSASCIIStringEncoding];
-            CFRelease(data);
-        }
-    }
-    return log;
-}
+@synthesize report;
+@synthesize reporter;
+@synthesize flashout;
 
 #pragma mark ApplicationDelegate
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification{
     // Insert code here to initialize your application
-    file = [[NSBundle mainBundle] pathForResource:@"pci" ofType:@"ids"];
-    pciFormat = @"0x%04lX%04lX";
-    [self willChangeValueForKey:@"patch"];
-    patch = @"0x00000000";
-    [self didChangeValueForKey:@"patch"];
+    self.patch = @"0x00000000";
+    self.bdmesg = [AppDelegate bdmesg];
+    self.pcis = [pciDevice readIDs];
+    self.status = [AppDelegate readHardware];
     watcher = [NSTask create:@"/usr/bin/tail" args:@[@"-n", @"0", @"-f", @"/var/log/system.log"] callback:@selector(readLog:) listener:self];
-    log = [NSMutableArray array];
-    [self willChangeValueForKey:@"bdmesg"];
-    bdmesg = [AppDelegate bdmesg];
-    [self didChangeValueForKey:@"bdmesg"];
-    [self willChangeValueForKey:@"pcis"];
-    pcis = [pciDevice readIDs];
-    [self didChangeValueForKey:@"pcis"];
-    [self willChangeValueForKey:@"status"];
-    status = [self listDevices];
-    [self didChangeValueForKey:@"status"];
     [watcher launch];
+    cond = [NSConditionLock new];
+    [panel setLevel:NSNormalWindowLevel];
 }
 -(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
     return true;
 }
 -(void)applicationWillTerminate:(NSNotification *)notification{
-    [watcher close];
-}
-
-#pragma mark PCI IDs
--(NSDictionary *)listDevices{
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    io_iterator_t itThis;
-    io_service_t service;
-    io_service_t parent;
-    io_name_t name;
-    #pragma mark Graphics
-    NSMutableArray *temp = [NSMutableArray array];
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("AtiFbStub"), &itThis) == KERN_SUCCESS) {
-        NSMutableDictionary *card;
-        int ports = 0;
-        unsigned long long old;
-        unsigned long long new;
-        service = 1;
-        while(service != 0) {
-            service = IOIteratorNext(itThis);
-            if(card==nil && service==0) break;
-            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-            IORegistryEntryGetRegistryEntryID(parent, &new);
-            if(card!=nil && new!=old){
-                [card setObject:@(ports) forKey:@"ports"];
-                [temp addObject:[NSDictionary dictionaryWithDictionary:card]];
-                card = nil;
-                ports = 0;
-            }
-            if(card==nil && service!=0) {
-                IORegistryEntryGetRegistryEntryID(parent, &old);
-                CFDataRef model = IORegistryEntryCreateCFProperty(parent, CFSTR("model"), kCFAllocatorDefault, 0);
-                IORegistryEntryGetName(service, name);
-                card = [NSMutableDictionary dictionaryWithDictionary:@{@"model":(CFGetTypeID(model)==CFDataGetTypeID())?@((const char *)CFDataGetBytePtr(model)):(__bridge NSString*)(CFStringRef)model, @"framebuffer":@(name)}];
-                CFRelease(model);
-            }
-            ports++;
-            IOObjectRelease(parent);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IONDRVDevice"), &itThis) == KERN_SUCCESS){
-        NSMutableDictionary *card;
-        int ports = 0;
-        unsigned long long old;
-        unsigned long long new;
-        service = 1;
-        while(service != 0) {
-            service = IOIteratorNext(itThis);
-            if(card==nil && service==0) break;
-            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-            IORegistryEntryGetRegistryEntryID(parent, &new);
-            if(card!=nil && new!=old){
-                [card setObject:@(ports) forKey:@"ports"];
-                [temp addObject:[NSDictionary dictionaryWithDictionary:card]];
-                card = nil;
-                ports = 0;
-            }
-            if(card==nil && service!=0) {
-                io_service_t child;
-                IORegistryEntryGetChildEntry(service, kIOServicePlane, &child);
-                IORegistryEntryGetRegistryEntryID(parent, &old);
-                CFDataRef model = (CFDataRef)IORegistryEntryCreateCFProperty(parent, CFSTR("model"), kCFAllocatorDefault, 0);
-                IORegistryEntryGetName(child, name);
-                card = [NSMutableDictionary dictionaryWithDictionary:@{@"model":(CFGetTypeID(model)==CFDataGetTypeID())?@((const char *)CFDataGetBytePtr(model)):(__bridge NSString*)(CFStringRef)model, @"framebuffer":@(name)}];
-                CFRelease(model);
-                IOObjectRelease(child);
-            }
-            ports++;
-            IOObjectRelease(parent);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("AppleIntelFramebuffer"), &itThis) == KERN_SUCCESS){
-        NSMutableDictionary *card;
-        int ports = 0;
-        unsigned long long old;
-        unsigned long long new;
-        service = 1;
-        while(service != 0) {
-            service = IOIteratorNext(itThis);
-            if(card==nil && service==0) break;
-            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-            IORegistryEntryGetRegistryEntryID(parent, &new);
-            if(card!=nil && new!=old){
-                [card setObject:@(ports) forKey:@"ports"];
-                [temp addObject:[NSDictionary dictionaryWithDictionary:card]];
-                card = nil;
-                ports = 0;
-            }
-            if(card==nil && service!=0) {
-                io_service_t child;
-                IORegistryEntryGetChildEntry(parent, kIOServicePlane, &child);
-                IORegistryEntryGetRegistryEntryID(parent, &old);
-                CFDataRef model = (CFDataRef)IORegistryEntryCreateCFProperty(parent, CFSTR("model"), kCFAllocatorDefault, 0);
-                IORegistryEntryGetName(child, name);
-                card = [NSMutableDictionary dictionaryWithDictionary:@{@"model":(CFGetTypeID(model)==CFDataGetTypeID())?@((const char *)CFDataGetBytePtr(model)):(__bridge NSString*)(CFStringRef)model, @"framebuffer":@(name)}];
-                CFRelease(model);
-                IOObjectRelease(child);
-            }
-            ports++;
-            IOObjectRelease(parent);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    [dict setObject:[NSArray arrayWithArray:temp] forKey:@"graphics"];
-    #pragma mark Network
-    temp = [NSMutableArray array];
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOEthernetInterface"), &itThis) == KERN_SUCCESS) {
-        CFStringRef model;
-        CFBooleanRef builtin;
-        while((service = IOIteratorNext(itThis))){
-            IORegistryEntryGetName(service, name);
-            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-            model = (CFStringRef)IORegistryEntryCreateCFProperty(parent, CFSTR("IOModel"), kCFAllocatorDefault, 0);
-            if (model == nil) {
-                IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-                IORegistryEntryGetName(parent, name);
-                model = (__bridge CFStringRef)(@(name));
-            }
-            builtin = (CFBooleanRef)IORegistryEntryCreateCFProperty(service, CFSTR("IOBuiltin"), kCFAllocatorDefault, 0);
-            [temp addObject:@{@"model":(__bridge NSString *)model,@"bsd":@(name),@"builtin":(__bridge NSNumber*)builtin}];
-            CFRelease(model);
-            CFRelease(builtin);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    [dict setObject:[NSArray arrayWithArray:temp] forKey:@"network"];
-    #pragma mark Audio
-    temp = [NSMutableArray array];
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("VoodooHDADevice"), &itThis)==KERN_SUCCESS) {
-        while((service = IOIteratorNext(itThis))) {
-            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-            IORegistryEntryGetName(parent, name);
-            //if(strcmp(name, "HDEF")==0){
-            pciDevice *audio = [pciDevice create:parent];
-            io_connect_t connect;
-            if(IOServiceOpen(service, mach_task_self(), 0, &connect)==KERN_SUCCESS){
-                mach_vm_address_t address;
-                mach_vm_size_t size;
-                if(IOConnectMapMemory64(connect, 0x2000, mach_task_self(), &address, &size, kIOMapAnywhere|kIOMapDefaultCache)==KERN_SUCCESS){
-                    __block NSMutableArray *hda = [NSMutableArray array];
-                    NSString *dump = [[NSString alloc] initWithBytes:(const void *)address length:size encoding:NSUTF8StringEncoding];
-                    [[NSRegularExpression regularExpressionWithPattern:@"Codec ID: 0x([0-9a-f]{8})" options:0 error:nil] enumerateMatchesInString:dump options:0 range:NSMakeRange(0, [dump length]) usingBlock:^void(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop){
-                        long codecid = strtol([[dump substringWithRange:[result rangeAtIndex:1]] UTF8String], NULL, 16);
-                        char *codecname = NULL;
-                        for(int n = 0; gCodecList[n].name; n++)
-                            if(HDA_DEV_MATCH(gCodecList[n].id, codecid)) { codecname = gCodecList[n].name; break; }
-                        if(codecname==NULL) codecname = (codecid==0) ? "NULL Codec" : "Unknown Codec";
-                        [hda addObject:@{@"device":[NSString stringWithFormat:pciFormat, [audio.vendor integerValue], [audio.device integerValue]], @"subdevice":[NSString stringWithFormat:pciFormat, [audio.subVendor integerValue], [audio.subDevice integerValue]], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"model":[NSString stringWithUTF8String:codecname]}];
-                    }];
-                    temp = hda;
-                    IOConnectUnmapMemory64(connect, 0x2000, mach_task_self(), address);
-                }
-                IOServiceClose(connect);
-            }
-            //}
-            IOObjectRelease(parent);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("AppleHDAController"), &itThis)==KERN_SUCCESS){
-        while((service = IOIteratorNext(itThis))) {
-            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
-            IORegistryEntryGetName(parent, name);
-            //if(strcmp(name, "HDEF")==0){
-            io_service_t child;
-            pciDevice *audio = [pciDevice create:parent];
-            io_iterator_t itChild;
-            if (IORegistryEntryGetChildIterator(service, kIOServicePlane, &itChild) == KERN_SUCCESS){
-                while ((child = IOIteratorNext(itChild))){
-                    long codecid;
-                    char *codecname = NULL;
-                    CFNumberRef codec = (CFNumberRef)IORegistryEntryCreateCFProperty(child, CFSTR("IOHDACodecVendorID"), kCFAllocatorDefault, 0);
-                    CFNumberGetValue(codec, kCFNumberLongType, &codecid);
-                    codecid &= 0x00000000FFFFFFFF;
-                    CFRelease(codec);
-                    for(int n = 0; gCodecList[n].name; n++)
-                        if(HDA_DEV_MATCH(gCodecList[n].id, codecid)) { codecname = gCodecList[n].name; break; }
-                    if(codecname==NULL) codecname = (codecid==0) ? "NULL Codec" : "Unknown Codec";
-                    [temp addObject:@{@"device":[NSString stringWithFormat:pciFormat, [audio.vendor integerValue], [audio.device integerValue]], @"subdevice":[NSString stringWithFormat:pciFormat, [audio.subVendor integerValue], [audio.subDevice integerValue]], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"model":[NSString stringWithUTF8String:codecname]}];
-                    IOObjectRelease(child);
-                }
-                IOObjectRelease(itChild);
-            }
-            //}
-            IOObjectRelease(parent);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    NSArray *filter = [temp valueForKey:@"device"];
-    NSString *matchString;
-    for(pciDevice *pci in pcis) {
-        matchString = [NSString stringWithFormat:pciFormat, [pci.vendor integerValue], [pci.device integerValue]];
-        if ([pci.pciClassCode integerValue] == 0x40300 && ![filter containsObject:matchString]) {
-            if((service = IOServiceGetMatchingService(kIOMasterPortDefault, CFDictionaryCreateCopy(kCFAllocatorDefault,(__bridge CFDictionaryRef)[pciDevice match:pci])))){
-                io_connect_t connect;
-                if(IOServiceOpen(service, mach_task_self(), 0, &connect)==KERN_SUCCESS){
-                    //FIXME: Map Memory
-                    IOServiceClose(connect);
-                }
-                else [temp addObject:@{@"device":matchString, @"subdevice":[NSString stringWithFormat:pciFormat, [pci.subVendor integerValue], [pci.subDevice integerValue]], @"codecid":@"", @"model":@""}];
-                IOObjectRelease(service);
-            }
-        }
-    }
-    [dict setObject:[NSArray arrayWithArray:temp] forKey:@"audio"];
-    #pragma mark Storage
-    temp = [NSMutableArray array];
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOAHCIBlockStorageDevice"), &itThis) == KERN_SUCCESS) {
-        CFDictionaryRef device;
-        CFDictionaryRef protocol;
-        while((service = IOIteratorNext(itThis))){
-            device = (CFDictionaryRef)IORegistryEntryCreateCFProperty(service, CFSTR("Device Characteristics"), kCFAllocatorDefault, 0);
-            protocol = (CFDictionaryRef)IORegistryEntryCreateCFProperty(service, CFSTR("Protocol Characteristics"), kCFAllocatorDefault, 0);
-            [temp addObject:@{@"model":(__bridge NSString*)(CFStringRef)CFDictionaryGetValue(device, CFSTR("Product Name")), @"block":(__bridge NSNumber*)(CFNumberRef)CFDictionaryGetValue(device, CFSTR("Physical Block Size")), @"inter":(__bridge NSString*)(CFStringRef)CFDictionaryGetValue(protocol, CFSTR("Physical Interconnect")), @"loc":(__bridge NSString*)(CFStringRef)CFDictionaryGetValue(protocol, CFSTR("Physical Interconnect Location"))}];
-            CFRelease(device);
-            CFRelease(protocol);
-            IOObjectRelease(service);
-        }
-        IOObjectRelease(itThis);
-    }
-    if(IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOSCSIHierarchicalLogicalUnit"), &itThis) == KERN_SUCCESS) {
-        CFDictionaryRef protocol;
-        CFStringRef dev;
-        CFStringRef ven;
-        io_service_t child,child1,child2,child3;
-        CFNumberRef block;
-        while((service = IOIteratorNext(itThis))){
-            protocol = (CFDictionaryRef)IORegistryEntryCreateCFProperty(service, CFSTR("Protocol Characteristics"), kCFAllocatorDefault, 0);
-            ven = (CFStringRef)IORegistryEntryCreateCFProperty(service, CFSTR("Vendor Identification"), kCFAllocatorDefault, 0);
-            dev = (CFStringRef)IORegistryEntryCreateCFProperty(service, CFSTR("Product Identification"), kCFAllocatorDefault, 0);
-            IORegistryEntryGetChildEntry(service, kIOServicePlane, &child);
-            IOObjectRelease(service);
-            IORegistryEntryGetChildEntry(child, kIOServicePlane, &child1);
-            IOObjectRelease(child);
-            IORegistryEntryGetChildEntry(child1, kIOServicePlane, &child2);
-            IOObjectRelease(child1);
-            IORegistryEntryGetChildEntry(child2, kIOServicePlane, &child3);
-            IOObjectRelease(child2);
-            block = (CFNumberRef)IORegistryEntryCreateCFProperty(child3, CFSTR("Preferred Block Size"), kCFAllocatorDefault, 0);
-            IOObjectRelease(child3);
-            [temp addObject:@{@"model":[NSString stringWithFormat:@"%@ %@", (__bridge NSString*)ven, (__bridge NSString*)dev], @"block":(__bridge NSNumber*)block, @"inter":(__bridge NSString*)(CFStringRef)CFDictionaryGetValue(protocol, CFSTR("Physical Interconnect")), @"loc":(__bridge NSString*)(CFStringRef)CFDictionaryGetValue(protocol, CFSTR("Physical Interconnect Location"))}];
-            CFRelease(block);
-            CFRelease(dev);
-            CFRelease(ven);
-            CFRelease(protocol);
-        }
-        IOObjectRelease(itThis);
-    }
-    [dict setObject:[NSArray arrayWithArray:temp] forKey:@"storage"];
-    return [NSDictionary dictionaryWithDictionary:dict];
+    [watcher terminate];
+    if (cond.condition == 1) [cond setCondition:2];
+    [cond waitOn:0];
 }
 
 #pragma mark NSToolbarDelegate
 -(BOOL)validateToolbarItem:(NSToolbarItem *)theItem{
-    return [theItem isEnabled];
+    return theItem.isEnabled;
 }
 
 #pragma mark GUI
+-(IBAction)copy:(id)sender{
+    NSResponder *obj = [[NSApp keyWindow] firstResponder];
+    if (obj.class == NSTableView.class) {
+        if (![(NSTableView *)obj numberOfSelectedRows]) return;
+        bool viewBased = ([(NSTableView *)obj rowViewAtRow:[(NSTableView *)obj selectedRow] makeIfNecessary:false]);
+        __block NSMutableArray *rows = [NSMutableArray array];
+        [[(NSTableView *)obj selectedRowIndexes] enumerateIndexesUsingBlock:^void(NSUInteger idx, BOOL *stop){
+            NSUInteger i = 0, j = [(NSTableView *)obj numberOfColumns];
+            NSMutableArray *row = [NSMutableArray array];
+            if (viewBased) {
+                NSText *view;
+                while (i < j)
+                    if ((view = [(NSTableView *)obj viewAtColumn:i++ row:idx makeIfNecessary:false]) && [view isKindOfClass:NSText.class])
+                        [row addObject:[view.string stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]];
+            }
+            else {
+                NSCell *cell;
+                while (i < j)
+                    if ((cell = [(NSTableView *)obj preparedCellAtColumn:i++ row:idx]) && [cell isKindOfClass:NSTextFieldCell.class])
+                        [row addObject:[cell.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]];
+            }
+            [row removeObject:@""];
+            [rows addObject:[row componentsJoinedByString:@", "]];
+        }];
+        [NSPasteboard.generalPasteboard clearContents];
+        [NSPasteboard.generalPasteboard writeObjects:@[[rows componentsJoinedByString:@"\n"]]];
+    }
+}
 -(IBAction)updateIDs:(id)sender{
     [sender setEnabled:false];
-    if ([URLTask conditionalGet:[NSURL URLWithString:@"http://pci-ids.ucw.cz/pci.ids"] toFile:file]) {
+    if ([URLTask conditionalGet:[NSURL URLWithString:@"http://pci-ids.ucw.cz/pci.ids"] toFile:[NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"]]) {
         [sender setLabel:@"Found"];
-        [NSTask launchedTaskWithLaunchPath:[[NSBundle mainBundle] executablePath] arguments:@[]];
-        [NSApp terminate:self];
+        self.pcis = [pciDevice readIDs];
     }
     else
         [sender setLabel:@"None"];
 }
 -(IBAction)updateSeed:(id)sender{
     [sender setEnabled:false];
-    if ([URLTask conditionalGet:[NSURL URLWithString:@"http://dpcimanager.sourceforge.net/seed.plist"] toFile:[[NSBundle mainBundle] pathForResource:@"seed" ofType:@"plist"]]) {
+    if ([URLTask conditionalGet:[NSURL URLWithString:@"http://dpcimanager.sourceforge.net/seed.plist"] toFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]]) {
         [sender setLabel:@"Found"];
-        [NSTask launchedTaskWithLaunchPath:[[NSBundle mainBundle] executablePath] arguments:@[]];
-        [NSApp terminate:self];
+        match = nil;
     }
     else
         [sender setLabel:@"None"];
@@ -404,46 +106,46 @@
     [sender setEnabled:false];
     NSMutableArray *pciids = [NSMutableArray array];
     for(pciDevice *dev in pcis)
-        [pciids addObject:[NSString stringWithFormat:@"id[]=%04lX,%04lX,%04lX,%04lX,%06lX", dev.vendor.integerValue, dev.device.integerValue, dev.subVendor.integerValue, dev.subDevice.integerValue, dev.pciClassCode.integerValue]];
+        [pciids addObject:[NSString stringWithFormat:@"id[]=%04lX,%04lX,%04lX,%04lX,%06lX", dev.shadowVendor.integerValue, dev.shadowDevice.integerValue, dev.subVendor.integerValue, dev.subDevice.integerValue, dev.pciClassCode.integerValue]];
     NSString *postData = [pciids componentsJoinedByString:@"&"];
     NSMutableURLRequest *DPCIReceiver = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://dpcimanager.sourceforge.net/receiver"]];
     [DPCIReceiver setHTTPMethod:@"POST"];
     [DPCIReceiver addValue: @"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-    [DPCIReceiver setValue:[NSString stringWithFormat: @"%lu",[postData length]] forHTTPHeaderField:@"Content-Length"];
+    [DPCIReceiver setValue:[NSString stringWithFormat: @"%lu", postData.length] forHTTPHeaderField:@"Content-Length"];
     [DPCIReceiver setHTTPBody: [postData dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:true]];
-    [NSURLConnection sendAsynchronousRequest:DPCIReceiver queue:[NSOperationQueue currentQueue] completionHandler:^void(NSURLResponse *response, NSData *data, NSError *error){
-        if (error == nil)
-            [sender setLabel:([(NSHTTPURLResponse *)response statusCode]==200)?@"Success":@"Failed"];
+    [NSURLConnection sendAsynchronousRequest:DPCIReceiver queue:NSOperationQueue.currentQueue completionHandler:^void(NSURLResponse *response, NSData *data, NSError *err){
+        if (!err)
+            [sender setLabel:([(NSHTTPURLResponse *)response statusCode] == 200)?@"Success":@"Failed"];
         else
-            [AppDelegate modalError:error];
+            ModalError(err);
     }];
 }
 -(IBAction)dumpTables:(id)sender{
     [AppDelegate acpitables:nil];
 }
 -(IBAction)dumpDsdt:(id)sender{
-    [AppDelegate acpitables:CFSTR("DSDT")];
+    [AppDelegate acpitables:@"DSDT"];
 }
 -(IBAction)fetchKext:(id)sender{
+    NSUInteger row = [(NSTableView *)sender selectedRow];
+    NSPredicate *filter = [NSPredicate predicateWithFormat:@"shadowVendor == %d AND shadowDevice == %d", strHexDec([[(NSTableView *)sender preparedCellAtColumn:1 row:row] stringValue]), strHexDec([[(NSTableView *)sender preparedCellAtColumn:2 row:row] stringValue])];
+    pciDevice *pci;
     io_service_t service;
-    CFURLRef url = nil;
-    pciDevice *dev = [pcis objectAtIndex:[(NSTableView *)sender selectedRow]];
-    if((service = IOServiceGetMatchingService(kIOMasterPortDefault, CFDictionaryCreateCopy(kCFAllocatorDefault,(__bridge CFDictionaryRef)[pciDevice match:dev])))) {
+    NSURL *url;
+    if ((pci = [[pcis filteredArrayUsingPredicate:filter] lastObject]) && (service = IOServiceGetMatchingService(kIOMasterPortDefault, (__bridge_retained CFDictionaryRef)[pciDevice match:pci]))) {
+        pciDevice *dev = [pciDevice create:service];
         io_service_t child;
-        if ([dev.pciClassCode integerValue] == 0x30000) {
+        if (dev.pciClassCode.integerValue == 0x30000) {
             io_iterator_t itThis;
-            if(IORegistryEntryGetChildIterator(service, kIOServicePlane, &itThis) == KERN_SUCCESS) {
+            if (IORegistryEntryGetChildIterator(service, kIOServicePlane, &itThis) == KERN_SUCCESS) {
                 io_name_t name;
                 char ending[9];
                 while ((child = IOIteratorNext(itThis))) {
                     IORegistryEntryGetName(child, name);
                     strlcpy(ending, name+MAX(0, strlen(name)-8), MIN(strlen(name), 9));
-                    if (strcmp(ending, "NVKernel") == 0 || strcmp(ending, "ntroller") == 0) {
-                        CFStringRef bundle = (CFStringRef)IORegistryEntryCreateCFProperty(child, CFSTR("CFBundleIdentifier"), kCFAllocatorDefault, 0);
-                        if (bundle != nil) {
-                            url = KextManagerCreateURLForBundleIdentifier(kCFAllocatorDefault, bundle);
-                            CFRelease(bundle);
-                        }
+                    if (!strcmp(ending, "NVKernel") || !strcmp(ending, "ntroller")) {
+                        NSString *class = (__bridge_transfer NSString *)IOObjectCopyClass(child), *bundle = (__bridge_transfer NSString *)IOObjectCopyBundleIdentifierForClass((__bridge CFStringRef)class);
+                        url = [AppDelegate findKext:bundle];
                         IOObjectRelease(child);
                         break;
                     }
@@ -453,24 +155,16 @@
             }
         }
         else if (IORegistryEntryGetChildEntry(service, kIOServicePlane, &child) == KERN_SUCCESS){
-            CFStringRef bundle = (CFStringRef)IORegistryEntryCreateCFProperty(child, CFSTR("CFBundleIdentifier"), kCFAllocatorDefault, 0);
-            if(bundle != nil) {
-                url = KextManagerCreateURLForBundleIdentifier(kCFAllocatorDefault, bundle);
-                CFRelease(bundle);
-            }
+            NSString *class = (__bridge_transfer NSString *)IOObjectCopyClass(child), *bundle = (__bridge_transfer NSString *)IOObjectCopyBundleIdentifierForClass((__bridge CFStringRef)class);
+            url = [AppDelegate findKext:bundle];
             IOObjectRelease(child);
         }
-        if (url != nil) {
-            [[NSWorkspace sharedWorkspace] selectFile:[(__bridge NSURL*)url path] inFileViewerRootedAtPath:[(__bridge NSURL*)url path]];
-            CFRelease(url);
-        }
+        if (url) SHOWFILE(url.path);
         else {
-            if (match == nil) match = [Match create];
-            matches = [match match:dev];
-            if ([matches count] > 0) {
-                [self willChangeValueForKey:@"matches"];
+            if (!match) match = [Match create];
+            self.matches = [match match:dev];
+            if (matches.count > 0) {
                 [pop showRelativeToRect:[sender rectOfRow:[sender selectedRow]] ofView:sender preferredEdge:NSMinXEdge];
-                [self didChangeValueForKey:@"matches"];
                 [[[[[[[[[pop contentViewController] view] subviews] objectAtIndex:0] subviews] objectAtIndex:0] subviews] objectAtIndex:0] expandItem:nil expandChildren:true];
             }
             else NSBeep();
@@ -479,16 +173,15 @@
     }
 }
 -(IBAction)patchNode:(id)sender{
-    [self willChangeValueForKey:@"patch"];
     if ([sender tag] < 2) {
-        NSInteger i = [[patch substringWithRange:NSMakeRange(2, 1)] integerValue]&(0b11<<([sender tag]==0?0:2));
-        i |= [[sender selectedItem] tag]<<([sender tag]==0?2:0);
-        patch = [patch stringByReplacingCharactersInRange:NSMakeRange(2, 1) withString:[NSString stringWithFormat:@"%01lX", i]];
-        if ([sender tag]==1) {
+        NSInteger i = [[patch substringWithRange:NSMakeRange(2, 1)] integerValue]&(0b11<<(![sender tag]?0:2));
+        i |= [[sender selectedItem] tag]<<(![sender tag]?2:0);
+        self.patch = [patch stringByReplacingCharactersInRange:NSMakeRange(2, 1) withString:[NSString stringWithFormat:@"%01lX", i]];
+        if ([sender tag] == 1) {
             i=0;
             [nodeLocation removeAllItems];
             for (NSString *choice in [@[@[@"N/A", @"Rear", @"Front", @"Left", @"Right", @"Top", @"Bottom", @"Rear Panel", @"Drive Bay"], @[@"N/A", @"", @"", @"", @"", @"", @"", @"Riser", @"Digital Display", @"ATAPI"], @[@"N/A", @"Rear", @"Front", @"Left", @"Right", @"Top", @"Bottom"], @[@"N/A", @"", @"", @"", @"", @"", @"Bottom", @"Inside Lid", @"Outside Lid"]] objectAtIndex:[[sender selectedItem] tag]]) {
-                if ([choice length] == 0) {
+                if (!choice.length) {
                     i++;
                     continue;
                 }
@@ -501,13 +194,18 @@
         }
     }
     else
-        patch = [patch stringByReplacingCharactersInRange:NSMakeRange([sender tag]+1, 1) withString:[NSString stringWithFormat:@"%lX", [[sender selectedItem] tag]]];
-    [self didChangeValueForKey:@"patch"];
+        self.patch = [patch stringByReplacingCharactersInRange:NSMakeRange([sender tag]+1, 1) withString:[NSString stringWithFormat:@"%lX", [[sender selectedItem] tag]]];
 }
--(IBAction)msrDumper:(id)sender{
+-(IBAction)pstates:(id)sender{
+    if (cond.condition) {
+        [cond setCondition:2];
+        return;
+    }
+    if (![AppDelegate checkDirect]) return;
     [sender setEnabled:false];
     [panel makeKeyAndOrderFront:sender];
-    [AScript loadKext:[[NSBundle mainBundle] pathForResource:@"MSRDumper" ofType:@"kext"]];
+    [cond setCondition:1];
+    [self performSelectorInBackground:@selector(logStates:) withObject:sender];
     [sender setEnabled:true];
 }
 -(IBAction)repair:(id)sender{
@@ -526,79 +224,124 @@
     NSOpenPanel *open = [NSOpenPanel openPanel];
     [open setAllowedFileTypes:@[@"kext"]];
     if ([open runModal] == NSFileHandlingPanelCancelButton) return;
+    NSString *kext = open.URL.path;
+    if ([NSFileManager.defaultManager fileExistsAtPath:[kSLE stringByAppendingPathComponent:kext.lastPathComponent]])
+        if (NSRunAlertPanel(@"Kernel Extension Already Exists", @"You are attempting to replace an existing kernel extension, continue?", nil, @"Cancel", nil) != NSAlertDefaultReturn)
+            return;
     [sender setEnabled:false];
     [panel makeKeyAndOrderFront:sender];
-    [AScript adminExec:[NSString stringWithFormat:@"/bin/cp -RX '%@' %@;/usr/bin/touch %@", [[[[open URLs] objectAtIndex:0] path] stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"], kSLE, kSLE]];
+    [AScript adminExec:[NSString stringWithFormat:@"/bin/rm -r '%@';/bin/cp -RX '%@' %@;/usr/bin/touch %@", [kSLE stringByAppendingPathComponent:[kext.lastPathComponent stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"]], [kext stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"], kSLE, kSLE]];
     [sender setEnabled:true];
 }
 -(IBAction)fetchCMOS:(id)sender{
     NSRange range = NSMakeRange(0, 128);
     unsigned char buff[range.length];
+    NSMutableData *cmos = [NSMutableData data];
     io_service_t service;
     if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleRTC")))) {
         io_connect_t connect;
-        if(IOServiceOpen(service, mach_task_self(), 0x0101FACE, &connect)==KERN_SUCCESS){
-            if(IOConnectCallMethod(connect, 0, (uint64_t *)&range.location, 1, NULL, 0, NULL, NULL, buff, &range.length) == KERN_SUCCESS){
-                [NSData dataWithBytes:buff length:range.length];
+        if (IOServiceOpen(service, mach_task_self(), 0x0101FACE, &connect) == KERN_SUCCESS){
+            while(IOConnectCallMethod(connect, 0, (uint64_t *)&range.location, 1, NULL, 0, NULL, NULL, buff, &range.length) == KERN_SUCCESS) {
+                [cmos appendBytes:buff length:range.length];
+                range.location += 128;
             }
             IOServiceClose(connect);
         }
         IOObjectRelease(service);
     }
 }
--(IBAction)readROM:(id)sender{
-    if (![AppDelegate checkDirect]) return;
-    NSSavePanel *save = [NSSavePanel savePanel];
-    [save setAllowedFileTypes:@[@"rom"]];
-    if([save runModal] == NSFileHandlingPanelOKButton) {
-        [panel makeKeyAndOrderFront:sender];
-        NSTask *task = [NSTask create:[[NSBundle mainBundle] pathForAuxiliaryExecutable:@"flashrom"] args:@[@"-r", [[save URL] path], @"-p", @"internal"] callback:@selector(logTask:) listener:self];
-        [task launchAndWait];
+-(IBAction)ethString:(id)sender{
+    if ([sender selectedRow] == -1) return;
+    pciDevice *device = [[[status objectForKey:@"network"] objectAtIndex:[sender selectedRow]] objectForKey:@"device"];
+    if ([device isMemberOfClass:[NSNull class]]) {
+        NSRunAlertPanel(@"Not a PCI Device", @"The chosen interface is not a PCI device", nil, nil, nil);
+        return;
+    }
+    NSString *efi = [efiObject stringWithArray:@[[efiObject create:device injecting:@{@"built-in":@YES}]]];
+    if (efi)
+        NSRunInformationalAlertPanel(@"Ethernet EFI String", @"Add the following to org.chameleon.boot.plist\n<key>device-properties</key>\n<string>%@</string>", nil, nil, nil, efi);
+    else
+        NSBeep();
+}
+-(IBAction)fetchvBIOS:(id)sender{
+    if ([sender selectedRow] == -1) return;
+    NSOpenPanel *open = DirectoryChooser();
+    [open setTitle:@"Save Video BIOS"];
+    if ([open runModal] != NSFileHandlingPanelOKButton) return;
+    pciDevice *device = [[[status objectForKey:@"graphics"] objectAtIndex:[sender selectedRow]] objectForKey:@"device"];
+    io_service_t service;
+    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, (__bridge_retained CFDictionaryRef)[pciDevice match:device]))) {
+        NSError *err;
+        NSData *bin;
+        if ((bin = (__bridge_transfer NSData *)IORegistryEntryCreateCFProperty(service, CFSTR("ATY,bin_image"), kCFAllocatorDefault, 0))) {
+            [bin writeToFile:[NSString stringWithFormat:@"%@/%04lx_%04lx_%04lx%04lx.rom", open.URL.path, device.vendor.integerValue, device.device.integerValue, device.subDevice.integerValue, device.subVendor.integerValue] options:NSDataWritingAtomic error:&err];
+            ModalError(err);
+        }
+        else if ((bin = (__bridge_transfer NSData *)IORegistryEntryCreateCFProperty(service, CFSTR("vbios"), kCFAllocatorDefault, 0))) {
+            [bin writeToFile:[NSString stringWithFormat:@"%@/%04lx_%04lx.rom", open.URL.path, device.vendor.integerValue, device.device.integerValue] options:NSDataWritingAtomic error:&err];
+            ModalError(err);
+        }
+        else if (device.vendor.integerValue == 0x10DE)
+            NSRunInformationalAlertPanel(@"NVidia Video BIOS Not Loaded", @"The video BIOS was not loaded at boot. Please reboot, enter 'VBIOS=Yes', and try again.", nil, nil, nil);
+        else NSBeep();
+        IOObjectRelease(service);
     }
 }
--(IBAction)writeROM:(id)sender{
-    if (![AppDelegate checkDirect]) return;
-    NSOpenPanel *open = [NSOpenPanel openPanel];
-    [open setAllowedFileTypes:@[@"rom"]];
-    if([open runModal] == NSFileHandlingPanelOKButton) {
-        [panel makeKeyAndOrderFront:sender];
-        NSTask *task = [NSTask create:[[NSBundle mainBundle] pathForAuxiliaryExecutable:@"flashrom"] args:@[@"-w", [[[open URLs] objectAtIndex:0] path], @"-p", @"internal"] callback:@selector(logTask:) listener:self];
-        [task launchAndWait];
-    }
-}
--(IBAction)testROM:(id)sender{
-    if (![AppDelegate checkDirect]) return;
-        [panel makeKeyAndOrderFront:sender];
-        NSTask *task = [NSTask create:[[NSBundle mainBundle] pathForAuxiliaryExecutable:@"flashrom"] args:@[@"-p", @"internal"] callback:@selector(logTask:) listener:self];
-        [task launchAndWait];
-}
-
 #pragma mark Logging
--(void)readLog:(NSData *)data{
-    [self willChangeValueForKey:@"log"];
-    for (NSString *line in [[[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"]) {
-        if ([line rangeOfString:@"MSRDumper"].location != NSNotFound || [line rangeOfString:@"kextd"].location != NSNotFound || [line rangeOfString:@"kextcache"].location != NSNotFound || [line rangeOfString:@"DirectHW"].location != NSNotFound || [line rangeOfString:@"Repair Permissions"].location != NSNotFound)
-            [log insertObject:@{@"timestamp":[NSDate date],@"entry":[line substringFromIndex:[line rangeOfString:@" " options:0 range:NSMakeRange(16, [line length]-16)].location+1]} atIndex:0];
+-(void)logStates:(id)sender{
+    io_service_t service;
+    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DirectHWService")))) {
+        NSUInteger frequency = 10;
+        NSMutableSet *states = [NSMutableSet set];
+        io_connect_t connect;
+        if (IOServiceOpen(service, mach_task_self(), 0, &connect) == KERN_SUCCESS) {
+            NSUInteger i = 0;
+            msrcmd_t in = {0, 0x198}, out;
+            size_t size = sizeof(msrcmd_t);
+            kern_return_t ret;
+            while (cond.condition != 2) {
+                usleep(kMillisecondScale/frequency);
+                if ((ret = IOConnectCallStructMethod(connect, 3, &in, size, &out, &size)) != KERN_SUCCESS) {
+                    if (ret == kIOReturnIOError && frequency > 1) {
+                        [self logLine:[@"P States: I/O error, throttling to " stringByAppendingFormat:@"%ldHz", --frequency]];
+                        continue;
+                    }
+                    [self logLine:[NSString stringWithFormat:@"P States: method failed, exiting 0x%X", ret]];
+                    break;
+                }
+                NSNumber *state = [NSNumber numberWithInteger:(!(out.lo&0xFF)) ? out.lo>>8&0xFF : out.lo&0xFF];
+                [states addObject:state];
+                if (!(i++ % (5*frequency))) {
+                    [self logLine:[NSString stringWithFormat:@"P States: %@", [[states.allObjects sortedArrayUsingSelector:@selector(compare:)] componentsJoinedByString:@", "]]];
+                    [self logLine:[NSString stringWithFormat:@"Current State: %@", state]];
+                }
+            }
+            IOServiceClose(connect);
+        }
+        IOObjectRelease(service);
     }
-    [self didChangeValueForKey:@"log"];
+    [[sender toolbar] setSelectedItemIdentifier:nil];
+    [cond setCondition:0];
+}
+-(void)readLog:(NSData *)data{
+    [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] enumerateLinesUsingBlock:^(NSString *line, BOOL *stop){
+        if ([line rangeOfString:@"kextd"].location != NSNotFound || [line rangeOfString:@"kextcache"].location != NSNotFound || [line rangeOfString:@"DirectHW"].location != NSNotFound || [line rangeOfString:@"Repair Permissions"].location != NSNotFound)
+            [self logLine:[line substringFromIndex:[line rangeOfString:@" " options:0 range:NSMakeRange(16, line.length-16)].location+1]];
+    }];
 }
 -(void)logTask:(NSData *)data{
-    [self willChangeValueForKey:@"log"];
-    for (NSString *line in [[[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"]) {
-        if ([line length] > 0)
-        [log insertObject:@{@"timestamp":[NSDate date],@"entry":line} atIndex:0];
-    }
-    [self didChangeValueForKey:@"log"];
+    [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] enumerateLinesUsingBlock:^(NSString *line, BOOL *stop){
+        if (line.length > 0) [self logLine:line];
+    }];
 }
-/*-(void)readPlist:(NSData *)data{
- NSDictionary *entry = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:nil];
- [self willChangeValueForKey:@"log"];
- [log insertObject:@{@"timestamp":[NSDate date],@"entry":([entry objectForKey:@"PercentComplete"] == nil)?[entry objectForKey:@"Status"]:[NSString stringWithFormat:@"Repair %@%% complete",[entry objectForKey:@"PercentComplete"]]} atIndex:0];
- if ([[entry objectForKey:@"End"] boolValue] == true) {
- [log insertObject:@{@"timestamp":[NSDate date],@"entry":@"Finished"} atIndex:0];
- [repair close];
- repair = nil;
- }
- [self didChangeValueForKey:@"log"];
- }*/
+-(void)logLine:(NSString *)line{
+    if (!NSThread.isMainThread) {
+        [self performSelectorOnMainThread:_cmd withObject:line waitUntilDone:false];
+        return;
+    }
+    if (!log) log = [NSMutableArray array];
+    [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:0] forKey:@"log"];
+    [log insertObject:@{@"timestamp":[NSDate date], @"entry":line} atIndex:0];
+    [self didChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndex:0] forKey:@"log"];
+}
 @end
