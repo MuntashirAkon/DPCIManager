@@ -92,7 +92,7 @@
 +(NSDictionary *)readHardware {
     NSArray *graphics = @[@{@"model":@"Unknown", @"framebuffer":@"Unknown", @"ports":@0}];
     NSArray *network = @[@{@"model":@"Unknown", @"bsd":@"nil", @"builtin":@NO}];
-    NSArray *audio = @[@{@"device":@"0x00000000", @"subdevice":@"0x00000000", @"codecid":@"0x00000000", @"model":@"Unknown"}];
+    NSArray *audio = @[@{@"device":@"0x00000000", @"subdevice":@"0x00000000", @"codecid":@"0x00000000", @"revision":@"0x0000", @"model":@"Unknown"}];
     NSArray *storage = @[@{@"model":@"Unknown", @"block":@"0", @"inter":@"Unknown", @"loc":@"Unknown"}];
     @try {graphics = [self listGraphics];} @catch (NSException *ex) {}
     @try {network = [self listNetwork];} @catch (NSException *ex) {}
@@ -255,13 +255,13 @@
                 if (IOConnectMapMemory64(connect, 0x2000, mach_task_self(), &address, &size, kIOMapAnywhere|kIOMapDefaultCache) == KERN_SUCCESS){
                     __block NSMutableArray *hda = [NSMutableArray array];
                     NSString *dump = [[NSString alloc] initWithBytes:(const void *)address length:size encoding:NSUTF8StringEncoding];
-                    [[NSRegularExpression regularExpressionWithPattern:@"Codec ID: 0x([0-9a-f]{8})" options:0 error:nil] enumerateMatchesInString:dump options:0 range:NSMakeRange(0, dump.length) usingBlock:^void(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop){
-                        long codecid = strHexDec([dump substringWithRange:[result rangeAtIndex:1]]);
+                    [[NSRegularExpression regularExpressionWithPattern:@"Codec ID: 0x([0-9a-f]{8})(?:\n.*){3}Revision: 0x([0-9a-f]{2})\n.*Stepping: 0x([0-9a-f]{2})" options:0 error:nil] enumerateMatchesInString:dump options:0 range:NSMakeRange(0, dump.length) usingBlock:^void(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop){
+                        long codecid = strHexDec([dump substringWithRange:[result rangeAtIndex:1]]), revision = strHexDec([dump substringWithRange:[result rangeAtIndex:2]]) << 8 | strHexDec([dump substringWithRange:[result rangeAtIndex:3]]);
                         char *codecname = NULL;
                         for(int n = 0; gCodecList[n].name; n++)
-                            if (HDA_DEV_MATCH(gCodecList[n].id, codecid)) { codecname = gCodecList[n].name; break; }
+                            if (HDA_DEV_MATCH(gCodecList[n].id, codecid) && revision >= gCodecList[n].rev) { codecname = gCodecList[n].name; break; }
                         if (codecname == NULL) codecname = !codecid ? "NULL Codec" : "Unknown Codec";
-                        [hda addObject:@{@"device":[NSString stringWithFormat:kPCIFormat, audio.vendor.integerValue, audio.device.integerValue], @"subdevice":[NSString stringWithFormat:kPCIFormat, audio.subVendor.integerValue, audio.subDevice.integerValue], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"model":[NSString stringWithUTF8String:codecname]}];
+                        [hda addObject:@{@"device":[NSString stringWithFormat:kPCIFormat, audio.vendor.integerValue, audio.device.integerValue], @"subdevice":[NSString stringWithFormat:kPCIFormat, audio.subVendor.integerValue, audio.subDevice.integerValue], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"revision":[NSString stringWithFormat:@"0x%04lX", revision], @"model":[NSString stringWithUTF8String:codecname]}];
                     }];
                     [temp addObjectsFromArray:hda];
                     IOConnectUnmapMemory64(connect, 0x2000, mach_task_self(), address);
@@ -284,14 +284,12 @@
             io_iterator_t itChild;
             if (IORegistryEntryGetChildIterator(service, kIOServicePlane, &itChild) == KERN_SUCCESS){
                 while ((child = IOIteratorNext(itChild))){
-                    long codecid = 0;
+                    long codecid = [[pciDevice grabNumber:CFSTR("IOHDACodecVendorID") forService:child] longValue] & 0xFFFFFFFF, revision = [[pciDevice grabNumber:CFSTR("IOHDACodecRevisionID") forService:child] longValue] & 0xFFFF;
                     char *codecname = NULL;
-                    NSNumber *codec = [pciDevice grabNumber:CFSTR("IOHDACodecVendorID") forService:child];
-                    if (codec.longValue) codecid = codec.longValue & 0xFFFFFFFF;
                     for(int n = 0; gCodecList[n].name; n++)
                         if (HDA_DEV_MATCH(gCodecList[n].id, codecid)) { codecname = gCodecList[n].name; break; }
                     if (codecname == NULL) codecname = !codecid ? "NULL Codec" : "Unknown Codec";
-                    [temp addObject:@{@"device":[NSString stringWithFormat:kPCIFormat, audio.vendor.integerValue, audio.device.integerValue], @"subdevice":[NSString stringWithFormat:kPCIFormat, audio.subVendor.integerValue, audio.subDevice.integerValue], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"model":[NSString stringWithUTF8String:codecname]}];
+                    [temp addObject:@{@"device":[NSString stringWithFormat:kPCIFormat, audio.vendor.integerValue, audio.device.integerValue], @"subdevice":[NSString stringWithFormat:kPCIFormat, audio.subVendor.integerValue, audio.subDevice.integerValue], @"codecid":[NSString stringWithFormat:@"0x%08lX", codecid], @"revision":[NSString stringWithFormat:@"0x%04lX", revision], @"model":[NSString stringWithUTF8String:codecname]}];
                     IOObjectRelease(child);
                 }
                 IOObjectRelease(itChild);
@@ -313,7 +311,7 @@
                     //FIXME: Map Memory
                     IOServiceClose(connect);
                 }
-                else [temp addObject:@{@"device":matchString, @"subdevice":[NSString stringWithFormat:kPCIFormat, pci.subVendor.integerValue, pci.subDevice.integerValue], @"codecid":@"", @"model":@""}];
+                else [temp addObject:@{@"device":matchString, @"subdevice":[NSString stringWithFormat:kPCIFormat, pci.subVendor.integerValue, pci.subDevice.integerValue], @"codecid":@"", @"revision":@"", @"model":@""}];
                 IOObjectRelease(service);
             }
         }
