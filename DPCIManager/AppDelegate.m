@@ -95,7 +95,8 @@
 }
 -(IBAction)updateSeed:(id)sender{
     [sender setEnabled:false];
-    if ([URLTask conditionalGet:[NSURL URLWithString:@"http://dpcimanager.sourceforge.net/seed.plist"] toFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]]) {
+    NSString *version = [[[[NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"] objectForKey:@"ProductVersion"] componentsSeparatedByString:@"."] objectAtIndex:1];
+    if ([URLTask conditionalGet:[NSURL URLWithString:[NSString stringWithFormat:@"http://dpcimanager.sourceforge.net/10.%@/seed.plist", version]] toFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]]) {
         [sender setLabel:@"Found"];
         match = nil;
     }
