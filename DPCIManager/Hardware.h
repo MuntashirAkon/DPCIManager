@@ -11,7 +11,6 @@
 
 @interface AppDelegate (HardwareAdditions)
 
-+(bool)securityCheck;
 +(void)acpitables:(NSString *)only;
 +(bool)checkDirect;
 +(NSString *)bdmesg;
