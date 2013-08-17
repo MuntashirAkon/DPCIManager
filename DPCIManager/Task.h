@@ -27,7 +27,11 @@
 
 @end
 
-@interface URLTask : NSObject <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
+@interface URLTask : NSObject <NSURLConnectionDelegate
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_7
+, NSURLConnectionDataDelegate
+#endif
+>
 
 @property NSURLConnection *connection;
 @property NSMutableData *hold;

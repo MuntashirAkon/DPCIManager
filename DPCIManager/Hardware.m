@@ -91,7 +91,7 @@
 }
 +(NSDictionary *)readHardware {
     NSArray *graphics = @[@{@"model":@"Unknown", @"framebuffer":@"Unknown", @"ports":@0}];
-    NSArray *network = @[@{@"model":@"Unknown", @"bsd":@"nil", @"builtin":@NO}];
+    NSArray *network = @[@{@"model":@"Unknown", @"bsd":@"nil", @"builtin":@(NO)}];
     NSArray *audio = @[@{@"device":@"0x00000000", @"subdevice":@"0x00000000", @"codecid":@"0x00000000", @"revision":@"0x0000", @"model":@"Unknown"}];
     NSArray *storage = @[@{@"model":@"Unknown", @"block":@"0", @"inter":@"Unknown", @"loc":@"Unknown"}];
     @try {graphics = [self listGraphics];} @catch (NSException *ex) {}

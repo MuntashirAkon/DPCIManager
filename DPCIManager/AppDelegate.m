@@ -258,7 +258,7 @@
         NSRunAlertPanel(@"Not a PCI Device", @"The chosen interface is not a PCI device", nil, nil, nil);
         return;
     }
-    NSString *efi = [efiObject stringWithArray:@[[efiObject create:device injecting:@{@"built-in":@YES}]]];
+    NSString *efi = [efiObject stringWithArray:@[[efiObject create:device injecting:@{@"built-in":@(YES)}]]];
     if (efi)
         NSRunInformationalAlertPanel(@"Ethernet EFI String", @"Add the following to org.chameleon.boot.plist\n<key>device-properties</key>\n<string>%@</string>", nil, nil, nil, efi);
     else
