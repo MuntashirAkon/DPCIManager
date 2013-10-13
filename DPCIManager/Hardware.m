@@ -305,7 +305,7 @@
     for(pciDevice *pci in [[NSApp delegate] pcis]) {
         matchString = [NSString stringWithFormat:kPCIFormat, pci.vendor.integerValue, pci.device.integerValue];
         if (pci.pciClassCode.integerValue == 0x40300 && ![filter containsObject:matchString]) {
-            if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, (__bridge_retained CFDictionaryRef)[pciDevice match:pci]))){
+            if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IORegistryEntryIDMatching(pci.entryID)))){
                 io_connect_t connect;
                 if (IOServiceOpen(service, mach_task_self(), 0, &connect) == KERN_SUCCESS){
                     //FIXME: Map Memory

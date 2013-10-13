@@ -71,6 +71,7 @@
 +(pciDevice *)create:(io_service_t)service{//FIXME: add validator option?
     pciDevice *temp = [pciDevice new];//!!!: agreements are base&compat, sub&compatsub, IOName&name
     @try {
+        IORegistryEntryGetRegistryEntryID(service, &temp->_entryID);
         temp.vendor = [self grabNumber:CFSTR("vendor-id") forService:service];
         temp.device = [self grabNumber:CFSTR("device-id") forService:service];
         temp.bus = [[[[pciDevice grabString:CFSTR("pcidebug") forService:service] stringByReplacingOccurrencesOfString:@"(" withString:@":"] componentsSeparatedByString:@":"] valueForKey:@"integerValue"];

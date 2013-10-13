@@ -128,15 +128,13 @@
     [AppDelegate acpitables:@"DSDT"];
 }
 -(IBAction)fetchKext:(id)sender{
-    NSUInteger row = [(NSTableView *)sender selectedRow];
-    NSPredicate *filter = [NSPredicate predicateWithFormat:@"shadowVendor == %d AND shadowDevice == %d", strHexDec([[(NSTableView *)sender preparedCellAtColumn:1 row:row] stringValue]), strHexDec([[(NSTableView *)sender preparedCellAtColumn:2 row:row] stringValue])];
-    pciDevice *pci;
+    NSArrayController *c = [[[[sender tableColumns] lastObject] infoForBinding:NSValueBinding] objectForKey:NSObservedObjectKey];
+    pciDevice *pci = [c.arrangedObjects objectAtIndex:[sender clickedRow]];
     io_service_t service;
     NSURL *url;
-    if ((pci = [[pcis filteredArrayUsingPredicate:filter] lastObject]) && (service = IOServiceGetMatchingService(kIOMasterPortDefault, (__bridge_retained CFDictionaryRef)[pciDevice match:pci]))) {
-        pciDevice *dev = [pciDevice create:service];
+    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IORegistryEntryIDMatching(pci.entryID)))) {
         io_service_t child;
-        if (dev.pciClassCode.integerValue == 0x30000) {
+        if (pci.pciClassCode.integerValue == 0x30000) {
             io_iterator_t itThis;
             if (IORegistryEntryGetChildIterator(service, kIOServicePlane, &itThis) == KERN_SUCCESS) {
                 io_name_t name;
@@ -163,7 +161,7 @@
         if (url) SHOWFILE(url.path);
         else {
             if (!match) match = [Match create];
-            self.matches = [match match:dev];
+            self.matches = [match match:pci];
             if (matches.count > 0) {
                 [pop showRelativeToRect:[sender rectOfRow:[sender selectedRow]] ofView:sender preferredEdge:NSMinXEdge];
                 [[[[[[[[[pop contentViewController] view] subviews] objectAtIndex:0] subviews] objectAtIndex:0] subviews] objectAtIndex:0] expandItem:nil expandChildren:true];
@@ -265,13 +263,13 @@
         NSBeep();
 }
 -(IBAction)fetchvBIOS:(id)sender{
-    if ([sender selectedRow] == -1) return;
+    if ([sender clickedRow] == -1) return;
     NSOpenPanel *open = DirectoryChooser();
     [open setTitle:@"Save Video BIOS"];
     if ([open runModal] != NSFileHandlingPanelOKButton) return;
-    pciDevice *device = [[[status objectForKey:@"graphics"] objectAtIndex:[sender selectedRow]] objectForKey:@"device"];
+    pciDevice *device = [[[status objectForKey:@"graphics"] objectAtIndex:[sender clickedRow]] objectForKey:@"device"];
     io_service_t service;
-    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, (__bridge_retained CFDictionaryRef)[pciDevice match:device]))) {
+    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IORegistryEntryIDMatching(device.entryID)))) {
         NSError *err;
         NSData *bin;
         if ((bin = (__bridge_transfer NSData *)IORegistryEntryCreateCFProperty(service, CFSTR("ATY,bin_image"), kCFAllocatorDefault, 0))) {

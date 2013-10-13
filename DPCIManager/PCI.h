@@ -8,6 +8,7 @@
 
 @interface pciDevice : NSObject
 
+@property uint64_t entryID;
 @property NSNumber *shadowVendor;
 @property NSNumber *shadowDevice;
 @property NSNumber *revision;
