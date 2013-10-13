@@ -44,8 +44,9 @@ static NSArray *matchKeys;
         if ([path.lastPathComponent isEqualToString:@"Info.plist"])
             if ((personalities = [Match personalities:[NSString stringWithFormat:@"%@/%@", kSLE, path]]))
                 for (NSString *personality in personalities) {
-                    if ((name = [NSString stringWithFormat:@"%@:%@", [self kextNameFromPath:path], personality]) && ![kexts objectForKey:name])
-                    [kexts setObject:[personalities objectForKey:personality] forKey:name];
+                    name = [NSString stringWithFormat:@"%@:%@", [self kextNameFromPath:path], personality];
+                    if (![kexts objectForKey:name])
+                        [kexts setObject:[personalities objectForKey:personality] forKey:name];
                     else
                         [kexts setObject:[[NSSet setWithArray:[[kexts objectForKey:name] arrayByAddingObjectsFromArray:[personalities objectForKey:personality]]] allObjects] forKey:name];
                 }
