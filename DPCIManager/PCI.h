@@ -28,6 +28,7 @@
 @property (readonly) NSString *lspciString;
 @property (readonly) long fullID;
 @property (readonly) long fullSubID;
+@property (readonly) short bdf;
 
 +(long)nameToLong:(NSString *)name;
 +(bool)isPCI:(io_service_t)service;

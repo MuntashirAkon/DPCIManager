@@ -115,6 +115,11 @@
 -(long)fullSubID{
     return subDevice.integerValue<<16 | subVendor.integerValue;
 }
+-(short)bdf {
+    if (self.bus.count > 2)
+        return [[self.bus objectAtIndex:0] unsignedCharValue] << 8 | [[self.bus objectAtIndex:1] unsignedCharValue] << 3 | [[self.bus objectAtIndex:2] unsignedCharValue];
+    return -1;
+}
 +(NSArray *)readIDs{
     FILE *handle = fopen([[NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"] fileSystemRepresentation], "rb");
     NSMutableDictionary *classes = [NSMutableDictionary dictionary];

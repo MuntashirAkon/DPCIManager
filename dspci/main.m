@@ -71,12 +71,17 @@ int main(int argc, const char * argv[])
         io_iterator_t itThis;
         if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOPCIDevice"), &itThis) == KERN_SUCCESS) {
             io_service_t service;
+            NSMutableArray *devices = [NSMutableArray array];
             while((service = IOIteratorNext(itThis))){
-                pciDevice *pci = [pciDevice create:service classes:classes vendors:vendors];
-                if (pci.fullID+pci.fullSubID > 0) printf("%s\n", pci.lspciString.UTF8String);
+                pciDevice *device = [pciDevice create:service classes:classes vendors:vendors];
+                if (device.fullID + device.fullSubID > 0) [devices addObject:device];
                 IOObjectRelease(service);
             }
             IOObjectRelease(itThis);
+            for (pciDevice *device in [devices sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+                return [obj1 bdf] - [obj2 bdf];
+            }])
+                printf("%s\n", device.lspciString.UTF8String);
         }
         
     }
