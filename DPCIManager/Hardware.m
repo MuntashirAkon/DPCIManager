@@ -45,14 +45,14 @@
         [AScript loadKext:[NSBundle.mainBundle pathForResource:@"DirectHW" ofType:@"kext"]];
         check = [[[(__bridge_transfer NSDictionary *)KextManagerCopyLoadedKextInfo((__bridge CFArrayRef)@[kDirectHWIdentifier], (__bridge CFArrayRef)@[kOSBundleStarted]) objectForKey:kDirectHWIdentifier] objectForKey:kOSBundleStarted] boolValue];
     }
-    if (check && ![[NSApp delegate] report]) {
+    if (check && ![(AppDelegate *)[NSApp delegate] report]) {
         NSDictionary *addrs = [URLTask getMACs];
         if ([addrs.allValues containsObject:kStubMAC])
             [[NSAlert alertWithMessageTextAndView:@"Bad MAC Address" defaultButton:nil alternateButton:nil otherButton:nil accessoryView:[NSAlert hyperlink:@"http://bit.ly/Tg8el9" title:@"Tools to flash and recover BIOS on ASUS P8xxx boards"] informativeTextWithFormat:@"A bad MAC address (%@) was detected on one or more ethernet interfaces, likely the result of an incomplete ASUS BIOS update.", kStubMAC] runModal];
         NSCharacterSet *white = [NSCharacterSet whitespaceAndNewlineCharacterSet];
         NSString *dmidecode = [NSBundle.mainBundle pathForAuxiliaryExecutable:@"dmidecode"], *board = [[NSTask launchAndOut:dmidecode args:@[@"-s", @"baseboard-product-name"]] stringByTrimmingCharactersInSet:white];
         if (!board.length || [board rangeOfString:@"Stop."].location != NSNotFound) {
-            [[NSApp delegate] setReport:[@{@"dmi":@"", @"socket":@0, @"addrs":addrs, @"chassis":@""} mutableCopy]];
+            [(AppDelegate *)[NSApp delegate] setReport:[@{@"dmi":@"", @"socket":@0, @"addrs":addrs, @"chassis":@""} mutableCopy]];
             NSRunCriticalAlertPanel(@"DMIDecode Error Detected", @"DPCIManager has detected a dmidecode error, and will be unable to fetch your motherboard's information for this task. Please exercise caution.", nil, nil, nil);
             return true;
         }
@@ -68,7 +68,7 @@
         manufacturer = [[[manufacturer componentsSeparatedByString:@" "] objectAtIndex:0] stringByTrimmingCharactersInSet:white];
         NSString *socket = [NSTask launchAndOut:dmidecode args:@[@"-t", @"processor"]];
         NSRange range = [[NSRegularExpression regularExpressionWithPattern:@"Socket Designation: .*\\d{4}" options:0 error:nil] rangeOfFirstMatchInString:socket options:0 range:NSMakeRange(0, socket.length)];
-        [[NSApp delegate] setReport:[@{@"dmi":[NSString stringWithFormat:@"%@ %@ %@", manufacturer, board, version], @"socket":(range.location == NSNotFound)?@0:@([[socket substringWithRange:NSMakeRange(NSMaxRange(range)-4, 4)] integerValue]), @"addrs":addrs, @"chassis":chassis} mutableCopy]];
+        [(AppDelegate *)[NSApp delegate] setReport:[@{@"dmi":[NSString stringWithFormat:@"%@ %@ %@", manufacturer, board, version], @"socket":(range.location == NSNotFound)?@0:@([[socket substringWithRange:NSMakeRange(NSMaxRange(range)-4, 4)] integerValue]), @"addrs":addrs, @"chassis":chassis} mutableCopy]];
     }
     return check;
 }
@@ -302,7 +302,7 @@
     }
     NSArray *filter = [temp valueForKey:@"device"];
     NSString *matchString;
-    for(pciDevice *pci in [[NSApp delegate] pcis]) {
+    for(pciDevice *pci in [(AppDelegate *)[NSApp delegate] pcis]) {
         matchString = [NSString stringWithFormat:kPCIFormat, pci.vendor.integerValue, pci.device.integerValue];
         if (pci.pciClassCode.integerValue == 0x40300 && ![filter containsObject:matchString]) {
             if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IORegistryEntryIDMatching(pci.entryID)))){

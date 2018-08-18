@@ -73,7 +73,6 @@
 		8716DE1B212854C500C47DE6 /* JSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
 		8716DE1C2128553200C47DE6 /* JSON.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSON.m; sourceTree = "<group>"; };
 		876B527221288815003E6A82 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		876B527421288DB4003E6A82 /* ddcli */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ddcli; path = ddcli/ddcli; sourceTree = SOURCE_ROOT; };
 		B00D8CF11685486C00D39BA8 /* FD44Copier */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = FD44Copier; sourceTree = SOURCE_ROOT; };
 		B025713B1601496400B0E1EB /* DPCIManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DPCIManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B025713F1601496400B0E1EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -222,7 +221,6 @@
 		B0F67A831696BDDD0059FD30 /* dspci */ = {
 			isa = PBXGroup;
 			children = (
-				876B527421288DB4003E6A82 /* ddcli */,
 				B0F67A841696BDDD0059FD30 /* main.m */,
 			);
 			path = dspci;
@@ -410,7 +408,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 256;
+				CURRENT_PROJECT_VERSION = 257;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -440,7 +438,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 256;
+				CURRENT_PROJECT_VERSION = 257;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
