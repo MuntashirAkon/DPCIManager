@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8716DE1D2128553200C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
 		8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
 		876B527321288815003E6A82 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 876B527221288815003E6A82 /* README.md */; };
 		B00D8CF41685487D00D39BA8 /* FD44Copier in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D8CF11685486C00D39BA8 /* FD44Copier */; };
@@ -193,8 +192,6 @@
 				B05AE9BA162A500B005190E4 /* Task.h */,
 				B05AE9BB162A500B005190E4 /* Task.m */,
 				B02571461601496400B0E1EB /* Supporting Files */,
-				8716DE1B212854C500C47DE6 /* JSON.h */,
-				8716DE1C2128553200C47DE6 /* JSON.m */,
 			);
 			path = DPCIManager;
 			sourceTree = "<group>";
@@ -221,10 +218,13 @@
 		B0F67A831696BDDD0059FD30 /* dspci */ = {
 			isa = PBXGroup;
 			children = (
+				8716DE1C2128553200C47DE6 /* JSON.m */,
+				8716DE1B212854C500C47DE6 /* JSON.h */,
 				B0F67A841696BDDD0059FD30 /* main.m */,
 			);
 			path = dspci;
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 /* End PBXGroup section */
 
@@ -353,7 +353,6 @@
 				B025714C1601496400B0E1EB /* main.m in Sources */,
 				B02571531601496400B0E1EB /* AppDelegate.m in Sources */,
 				B07193831623B776006D5666 /* PCI.m in Sources */,
-				8716DE1D2128553200C47DE6 /* JSON.m in Sources */,
 				B08396ED1627F137003427F4 /* Match.m in Sources */,
 				B05AE9BC162A500B005190E4 /* Task.m in Sources */,
 				B09012811705921600D0F913 /* Hardware.m in Sources */,
