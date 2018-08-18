@@ -4,8 +4,6 @@ Simple OS X app for viewing PCI hardware info
 **NOTE:** I'll only provide support for `dspci` tool, NOT `DPCIManager.app` (I'll update PCI IDs occassionally, however).
   But I'am still keeping it in case someone is interested in contributing.
 
-**NOTE 2:** By "_version_", I meant the version of `dspci`, NOT `DPCIManager.app` (which will remain `1.5`)
-
 ### Binaries
 You can find the [latest binary](https://github.com/MuntashirAkon/DPCIManager/releases/latest)
 in the [release](https://github.com/MuntashirAkon/DPCIManager/releases) section.
