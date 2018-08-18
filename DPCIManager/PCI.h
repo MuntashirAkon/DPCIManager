@@ -26,6 +26,7 @@
 @property NSString *subClassString;
 @property (readonly) NSString *fullClassString;
 @property (readonly) NSString *lspciString;
+@property (readonly) NSDictionary *lspciDictionary;
 @property (readonly) long fullID;
 @property (readonly) long fullSubID;
 @property (readonly) short bdf;

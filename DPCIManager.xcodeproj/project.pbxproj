@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8716DE1D2128553200C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
+		8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
 		B00D8CF41685487D00D39BA8 /* FD44Copier in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D8CF11685486C00D39BA8 /* FD44Copier */; };
 		B02571401601496400B0E1EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025713F1601496400B0E1EB /* Cocoa.framework */; };
 		B025714C1601496400B0E1EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B025714B1601496400B0E1EB /* main.m */; };
@@ -67,6 +69,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8716DE1B212854C500C47DE6 /* JSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
+		8716DE1C2128553200C47DE6 /* JSON.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSON.m; sourceTree = "<group>"; };
 		B00D8CF11685486C00D39BA8 /* FD44Copier */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = FD44Copier; sourceTree = SOURCE_ROOT; };
 		B025713B1601496400B0E1EB /* DPCIManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DPCIManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B025713F1601496400B0E1EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -186,6 +190,8 @@
 				B05AE9BA162A500B005190E4 /* Task.h */,
 				B05AE9BB162A500B005190E4 /* Task.m */,
 				B02571461601496400B0E1EB /* Supporting Files */,
+				8716DE1B212854C500C47DE6 /* JSON.h */,
+				8716DE1C2128553200C47DE6 /* JSON.m */,
 			);
 			path = DPCIManager;
 			sourceTree = "<group>";
@@ -281,10 +287,10 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0450;
-				ORGANIZATIONNAME = Sourceforge;
+				ORGANIZATIONNAME = "";
 			};
 			buildConfigurationList = B02571351601496300B0E1EB /* Build configuration list for PBXProject "DPCIManager" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -343,6 +349,7 @@
 				B025714C1601496400B0E1EB /* main.m in Sources */,
 				B02571531601496400B0E1EB /* AppDelegate.m in Sources */,
 				B07193831623B776006D5666 /* PCI.m in Sources */,
+				8716DE1D2128553200C47DE6 /* JSON.m in Sources */,
 				B08396ED1627F137003427F4 /* Match.m in Sources */,
 				B05AE9BC162A500B005190E4 /* Task.m in Sources */,
 				B09012811705921600D0F913 /* Hardware.m in Sources */,
@@ -354,6 +361,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */,
 				B0F67A8E1696BE6D0059FD30 /* PCI.m in Sources */,
 				B0F67A851696BDDD0059FD30 /* main.m in Sources */,
 			);
@@ -395,7 +403,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_MARKETING_VERSION = 1.5;
+				CURRENT_MARKETING_VERSION = 1.6;
 				CURRENT_PROJECT_VERSION = 256;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -425,9 +433,9 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_MARKETING_VERSION = 1.5;
+				CURRENT_MARKETING_VERSION = 1.6;
 				CURRENT_PROJECT_VERSION = 256;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;

@@ -8,14 +8,19 @@
 
 #import <Foundation/Foundation.h>
 #import <mach-o/getsect.h>
+#import <string.h>
 #import "PCI.h"
+#import "JSON.h"
+
+// Arguments
+#define JSONData "JSONData"
 
 int main(int argc, const char * argv[])
 {
-
     @autoreleasepool {
-        
-        // insert code here...
+        // Parse Arguments: currently only JSONData
+        BOOL printJSON = (argc > 1 && strcmp(JSONData,argv[1]) == 0) ? true : false;
+        // Main begins
         unsigned long len;
         char *handle = strdup(getsectdata("__TEXT", "__pci_ids", &len));
         NSMutableDictionary *classes = [NSMutableDictionary dictionary];
@@ -23,8 +28,8 @@ int main(int argc, const char * argv[])
         NSNumber *currentClass;
         NSNumber *currentVendor;
         char buffer[LINE_MAX];
+        if(!printJSON) printf("Using PCI.IDs %s\n", buffer);
         sscanf(strstr(handle, "Version:"), "Version: %[^\n]", buffer);
-        printf("Using PCI.IDs %s\n", buffer);
         long device_id, subclass_id;
         char *buf;
         bool class_parse = false;
@@ -72,6 +77,7 @@ int main(int argc, const char * argv[])
         if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOPCIDevice"), &itThis) == KERN_SUCCESS) {
             io_service_t service;
             NSMutableArray *devices = [NSMutableArray array];
+            NSMutableArray *devicesJSON = [NSMutableArray array];
             while((service = IOIteratorNext(itThis))){
                 pciDevice *device = [pciDevice create:service classes:classes vendors:vendors];
                 if (device.fullID + device.fullSubID > 0) [devices addObject:device];
@@ -80,8 +86,11 @@ int main(int argc, const char * argv[])
             IOObjectRelease(itThis);
             for (pciDevice *device in [devices sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
                 return [obj1 bdf] - [obj2 bdf];
-            }])
-                printf("%s\n", device.lspciString.UTF8String);
+            }]){
+                if(printJSON) [devicesJSON addObject:device.lspciDictionary];
+                else printf("%s\n", device.lspciString.UTF8String);
+            }
+            if(printJSON) printf("%s\n", [devicesJSON bv_jsonStringWithPrettyPrint:true].UTF8String);
         }
         
     }

@@ -109,6 +109,35 @@
 -(NSString *)lspciString{
     return [NSString stringWithFormat:@"%02lx:%02lx.%01lx %@ [%04lx]: %@ %@ [%04lx:%04lx]%@%@", [[bus objectAtIndex:0] integerValue], [[bus objectAtIndex:1] integerValue], [[bus objectAtIndex:2] integerValue], subClassString, pciClassCode.integerValue>>8, vendorString, deviceString, shadowVendor.integerValue, shadowDevice.integerValue, !revision.integerValue?@"":[NSString stringWithFormat:@" (rev %02lx)", revision.integerValue], !subDevice.integerValue?@"":[NSString stringWithFormat:@" (subsys %04lx:%04lx)", subVendor.integerValue, subDevice.integerValue]];
 }
+-(NSDictionary *)lspciDictionary{
+    NSDictionary *lspci_dict = @{
+      // BusNumber:DeviceNumber.FunctionNumber
+      @"BDF": [NSString stringWithFormat:@"%02lx:%02lx.%01lx", [[bus objectAtIndex:0] integerValue], [[bus objectAtIndex:1] integerValue], [[bus objectAtIndex:2] integerValue]],
+      // Device's Class
+      @"Class": @{
+              @"Name": subClassString,
+              @"Code": [NSString stringWithFormat:@"%04lx", pciClassCode.integerValue>>8]
+      },
+      // Device Info
+      @"Info": @{
+              @"Name": vendorString,
+              @"Vendor": deviceString
+      },
+      // Device ID
+      @"ID": @{
+              @"DeviceID": [NSString stringWithFormat:@"%04lx", shadowDevice.integerValue],
+              @"VendorID": [NSString stringWithFormat:@"%04lx", shadowVendor.integerValue]
+      },
+      // Subsystem ID
+      @"SubsysID": @{
+              @"DeviceID": [NSString stringWithFormat:@"%04lx", subDevice.integerValue],
+              @"VendorID": [NSString stringWithFormat:@"%04lx", subVendor.integerValue]
+      },
+      // Revision
+      @"Rev": [NSString stringWithFormat:@"%02lx", revision.integerValue]
+    };
+    return lspci_dict;
+}
 -(long)fullID{
     return device.integerValue<<16 | vendor.integerValue;
 }

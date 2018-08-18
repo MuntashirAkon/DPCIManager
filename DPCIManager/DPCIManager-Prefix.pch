@@ -17,7 +17,7 @@ NS_INLINE NSError* ModalError(NSError *error){
 }
 NS_INLINE void ModalErrorWithDict(NSDictionary *err){
     if (err && [[err objectForKey:NSAppleScriptErrorNumber] integerValue] != -128)
-        NSRunCriticalAlertPanel([err objectForKey:NSAppleScriptErrorMessage], [err objectForKey:NSAppleScriptErrorBriefMessage], nil, nil, nil);
+        NSRunCriticalAlertPanel([err objectForKey:NSAppleScriptErrorMessage], @"%@", [err objectForKey:NSAppleScriptErrorBriefMessage], nil, nil, nil);
 }
 NS_INLINE NSOpenPanel* DirectoryChooser() {
     NSOpenPanel *temp = [NSOpenPanel openPanel];
