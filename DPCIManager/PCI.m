@@ -120,8 +120,8 @@
       },
       // Device Info
       @"Info": @{
-              @"Name": vendorString,
-              @"Vendor": deviceString
+              @"Name": deviceString,
+              @"Vendor": vendorString
       },
       // Device ID
       @"ID": @{

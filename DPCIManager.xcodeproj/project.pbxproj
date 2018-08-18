@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8716DE1D2128553200C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
 		8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
+		876B527321288815003E6A82 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 876B527221288815003E6A82 /* README.md */; };
 		B00D8CF41685487D00D39BA8 /* FD44Copier in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D8CF11685486C00D39BA8 /* FD44Copier */; };
 		B02571401601496400B0E1EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025713F1601496400B0E1EB /* Cocoa.framework */; };
 		B025714C1601496400B0E1EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B025714B1601496400B0E1EB /* main.m */; };
@@ -71,6 +72,8 @@
 /* Begin PBXFileReference section */
 		8716DE1B212854C500C47DE6 /* JSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
 		8716DE1C2128553200C47DE6 /* JSON.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSON.m; sourceTree = "<group>"; };
+		876B527221288815003E6A82 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		876B527421288DB4003E6A82 /* ddcli */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ddcli; path = ddcli/ddcli; sourceTree = SOURCE_ROOT; };
 		B00D8CF11685486C00D39BA8 /* FD44Copier */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = FD44Copier; sourceTree = SOURCE_ROOT; };
 		B025713B1601496400B0E1EB /* DPCIManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DPCIManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B025713F1601496400B0E1EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -134,6 +137,7 @@
 		B02571301601496300B0E1EB = {
 			isa = PBXGroup;
 			children = (
+				876B527221288815003E6A82 /* README.md */,
 				B02571451601496400B0E1EB /* DPCIManager */,
 				B0F67A831696BDDD0059FD30 /* dspci */,
 				B025713E1601496400B0E1EB /* Frameworks */,
@@ -218,6 +222,7 @@
 		B0F67A831696BDDD0059FD30 /* dspci */ = {
 			isa = PBXGroup;
 			children = (
+				876B527421288DB4003E6A82 /* ddcli */,
 				B0F67A841696BDDD0059FD30 /* main.m */,
 			);
 			path = dspci;
@@ -313,6 +318,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				876B527321288815003E6A82 /* README.md in Resources */,
 				B02571561601496400B0E1EB /* MainMenu.xib in Resources */,
 				B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */,
 				B025716C16018D9600B0E1EB /* pci.ids in Resources */,
@@ -567,6 +573,7 @@
 				B0683A9F17AF4EE7003A10CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B0F67A8C1696BDDD0059FD30 /* Build configuration list for PBXNativeTarget "dspci" */ = {
 			isa = XCConfigurationList;

@@ -17,13 +17,33 @@ As of version `1.6`, you can get JSON output using `JSONData` agrument:
 ```sh
 dspci JSONData
 ```
-**Example Output**
+
+#### JSON Schema
+An output contains an array of objects which have the following attributes. 
+For understanding JSON schema easily, I've . (dot) for objects and [] (square brackets) for arrays:
+
+* `BDF`: (String) Bus number, Device number, Function number (Format `B:D.F`)
+* `Class`: (Object) Device's class
+    - `Class.Name`: (String) Device's class name
+    - `Class.Code`: (Hex String) Device's class code
+* `Info`: (Object) Device info
+    - `Info.Name`: (String) Device's name
+    - `Info.Vendor`: (String) Device's vendor
+* `ID`: (Object) Device's full ID
+    - `ID.VendorID`: (Hex String) Device's vendor ID
+    - `ID.DeviceID`: (Hex String) Device's ID
+* `SubsysID`: (Object) Device's subsystem ID
+    - `SubsysID.VendorID`: (Hex String) Subsystem's vendor ID
+    - `SubsysID.DeviceID`: (Hex String) Subsystem's ID
+* `Rev`:  (Hex String)  Revision
+
+#### Example Output
 ```json
 [
   {
     "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Xeon E3-1200 v6\/7th Gen Core Processor Host Bridge\/DRAM Registers"
+      "Name" : "Xeon E3-1200 v6\/7th Gen Core Processor Host Bridge\/DRAM Registers",
+      "Vendor" : "Intel Corporation"
     },
     "ID" : {
       "VendorID" : "8086",
@@ -42,8 +62,8 @@ dspci JSONData
   },
   {
     "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "HD Graphics 620"
+      "Name" : "HD Graphics 620",
+      "Vendor" : "Intel Corporation"
     },
     "ID" : {
       "VendorID" : "8086",
@@ -58,306 +78,6 @@ dspci JSONData
     "Class" : {
       "Code" : "0300",
       "Name" : "VGA compatible controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Xeon E3-1200 v5\/E3-1500 v5\/6th Gen Core Processor Thermal Subsystem"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "1903"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "02",
-    "BDF" : "00:04.0",
-    "Class" : {
-      "Code" : "1180",
-      "Name" : "Signal processing controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP USB 3.0 xHCI Controller"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d2f"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:14.0",
-    "Class" : {
-      "Code" : "0c03",
-      "Name" : "USB controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP Thermal subsystem"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d31"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:14.2",
-    "Class" : {
-      "Code" : "1180",
-      "Name" : "Signal processing controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP Serial IO I2C Controller #0"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d60"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:15.0",
-    "Class" : {
-      "Code" : "1180",
-      "Name" : "Signal processing controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP Serial IO I2C Controller #1"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d61"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:15.1",
-    "Class" : {
-      "Code" : "1180",
-      "Name" : "Signal processing controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP CSME HECI #1"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d3a"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:16.0",
-    "Class" : {
-      "Code" : "0780",
-      "Name" : "Communication controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP SATA Controller [AHCI mode]"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d03"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:17.0",
-    "Class" : {
-      "Code" : "0106",
-      "Name" : "SATA controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP PCI Express Root Port #5"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d14"
-    },
-    "SubsysID" : {
-      "VendorID" : "0000",
-      "DeviceID" : "0000"
-    },
-    "Rev" : "f1",
-    "BDF" : "00:1c.0",
-    "Class" : {
-      "Code" : "0604",
-      "Name" : "PCI bridge"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP PCI Express Root Port #6"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d15"
-    },
-    "SubsysID" : {
-      "VendorID" : "007f",
-      "DeviceID" : "0000"
-    },
-    "Rev" : "f1",
-    "BDF" : "00:1c.5",
-    "Class" : {
-      "Code" : "0604",
-      "Name" : "PCI bridge"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP LPC Controller"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d58"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:1f.0",
-    "Class" : {
-      "Code" : "0601",
-      "Name" : "ISA bridge"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP PMC"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d21"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:1f.2",
-    "Class" : {
-      "Code" : "0580",
-      "Name" : "Memory controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP HD Audio"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d71"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:1f.3",
-    "Class" : {
-      "Code" : "0403",
-      "Name" : "Audio device"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Sunrise Point-LP SMBus"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "9d23"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "21",
-    "BDF" : "00:1f.4",
-    "Class" : {
-      "Code" : "0c05",
-      "Name" : "SMBus"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Intel Corporation",
-      "Vendor" : "Wireless 3165"
-    },
-    "ID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "3165"
-    },
-    "SubsysID" : {
-      "VendorID" : "8086",
-      "DeviceID" : "4410"
-    },
-    "Rev" : "79",
-    "BDF" : "01:00.0",
-    "Class" : {
-      "Code" : "0280",
-      "Name" : "Network controller"
-    }
-  },
-  {
-    "Info" : {
-      "Name" : "Realtek Semiconductor Co., Ltd.",
-      "Vendor" : "RTL810xE PCI Express Fast Ethernet controller"
-    },
-    "ID" : {
-      "VendorID" : "10ec",
-      "DeviceID" : "8136"
-    },
-    "SubsysID" : {
-      "VendorID" : "1028",
-      "DeviceID" : "0767"
-    },
-    "Rev" : "07",
-    "BDF" : "02:00.0",
-    "Class" : {
-      "Code" : "0200",
-      "Name" : "Ethernet controller"
     }
   }
 ]
