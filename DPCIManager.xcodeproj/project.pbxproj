@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
 		876B527321288815003E6A82 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 876B527221288815003E6A82 /* README.md */; };
+		876B52812129F464003E6A82 /* dd_getopt_long-fbsd.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52782129F463003E6A82 /* dd_getopt_long-fbsd.m */; };
+		876B52822129F464003E6A82 /* DDCliApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52792129F463003E6A82 /* DDCliApplication.m */; };
+		876B52832129F464003E6A82 /* DDCliParseException.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B527B2129F464003E6A82 /* DDCliParseException.m */; };
+		876B52842129F464003E6A82 /* DDCliUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B527E2129F464003E6A82 /* DDCliUtil.m */; };
+		876B52852129F464003E6A82 /* DDGetoptLongParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52802129F464003E6A82 /* DDGetoptLongParser.m */; };
+		876B52882129F5BA003E6A82 /* dspci.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52872129F5BA003E6A82 /* dspci.m */; };
 		B00D8CF41685487D00D39BA8 /* FD44Copier in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D8CF11685486C00D39BA8 /* FD44Copier */; };
 		B02571401601496400B0E1EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025713F1601496400B0E1EB /* Cocoa.framework */; };
 		B025714C1601496400B0E1EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B025714B1601496400B0E1EB /* main.m */; };
@@ -72,6 +78,18 @@
 		8716DE1B212854C500C47DE6 /* JSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
 		8716DE1C2128553200C47DE6 /* JSON.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSON.m; sourceTree = "<group>"; };
 		876B527221288815003E6A82 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		876B52772129F463003E6A82 /* DDCliUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDCliUtil.h; path = ddcli/lib/DDCliUtil.h; sourceTree = SOURCE_ROOT; };
+		876B52782129F463003E6A82 /* dd_getopt_long-fbsd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "dd_getopt_long-fbsd.m"; path = "ddcli/lib/dd_getopt_long-fbsd.m"; sourceTree = SOURCE_ROOT; };
+		876B52792129F463003E6A82 /* DDCliApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDCliApplication.m; path = ddcli/lib/DDCliApplication.m; sourceTree = SOURCE_ROOT; };
+		876B527A2129F464003E6A82 /* DDCommandLineInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDCommandLineInterface.h; path = ddcli/lib/DDCommandLineInterface.h; sourceTree = SOURCE_ROOT; };
+		876B527B2129F464003E6A82 /* DDCliParseException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDCliParseException.m; path = ddcli/lib/DDCliParseException.m; sourceTree = SOURCE_ROOT; };
+		876B527C2129F464003E6A82 /* DDCliApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDCliApplication.h; path = ddcli/lib/DDCliApplication.h; sourceTree = SOURCE_ROOT; };
+		876B527D2129F464003E6A82 /* DDCliParseException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDCliParseException.h; path = ddcli/lib/DDCliParseException.h; sourceTree = SOURCE_ROOT; };
+		876B527E2129F464003E6A82 /* DDCliUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDCliUtil.m; path = ddcli/lib/DDCliUtil.m; sourceTree = SOURCE_ROOT; };
+		876B527F2129F464003E6A82 /* DDGetoptLongParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDGetoptLongParser.h; path = ddcli/lib/DDGetoptLongParser.h; sourceTree = SOURCE_ROOT; };
+		876B52802129F464003E6A82 /* DDGetoptLongParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDGetoptLongParser.m; path = ddcli/lib/DDGetoptLongParser.m; sourceTree = SOURCE_ROOT; };
+		876B52862129F599003E6A82 /* dspci.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dspci.h; sourceTree = "<group>"; };
+		876B52872129F5BA003E6A82 /* dspci.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = dspci.m; sourceTree = "<group>"; };
 		B00D8CF11685486C00D39BA8 /* FD44Copier */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = FD44Copier; sourceTree = SOURCE_ROOT; };
 		B025713B1601496400B0E1EB /* DPCIManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DPCIManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B025713F1601496400B0E1EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -132,6 +150,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		876B52762129F43E003E6A82 /* ddcli */ = {
+			isa = PBXGroup;
+			children = (
+				876B52782129F463003E6A82 /* dd_getopt_long-fbsd.m */,
+				876B527C2129F464003E6A82 /* DDCliApplication.h */,
+				876B52792129F463003E6A82 /* DDCliApplication.m */,
+				876B527D2129F464003E6A82 /* DDCliParseException.h */,
+				876B527B2129F464003E6A82 /* DDCliParseException.m */,
+				876B52772129F463003E6A82 /* DDCliUtil.h */,
+				876B527E2129F464003E6A82 /* DDCliUtil.m */,
+				876B527A2129F464003E6A82 /* DDCommandLineInterface.h */,
+				876B527F2129F464003E6A82 /* DDGetoptLongParser.h */,
+				876B52802129F464003E6A82 /* DDGetoptLongParser.m */,
+			);
+			name = ddcli;
+			sourceTree = "<group>";
+		};
 		B02571301601496300B0E1EB = {
 			isa = PBXGroup;
 			children = (
@@ -218,9 +253,12 @@
 		B0F67A831696BDDD0059FD30 /* dspci */ = {
 			isa = PBXGroup;
 			children = (
+				876B52762129F43E003E6A82 /* ddcli */,
 				8716DE1C2128553200C47DE6 /* JSON.m */,
 				8716DE1B212854C500C47DE6 /* JSON.h */,
 				B0F67A841696BDDD0059FD30 /* main.m */,
+				876B52862129F599003E6A82 /* dspci.h */,
+				876B52872129F5BA003E6A82 /* dspci.m */,
 			);
 			path = dspci;
 			sourceTree = "<group>";
@@ -365,8 +403,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */,
+				876B52812129F464003E6A82 /* dd_getopt_long-fbsd.m in Sources */,
 				B0F67A8E1696BE6D0059FD30 /* PCI.m in Sources */,
+				876B52882129F5BA003E6A82 /* dspci.m in Sources */,
+				876B52842129F464003E6A82 /* DDCliUtil.m in Sources */,
 				B0F67A851696BDDD0059FD30 /* main.m in Sources */,
+				876B52832129F464003E6A82 /* DDCliParseException.m in Sources */,
+				876B52822129F464003E6A82 /* DDCliApplication.m in Sources */,
+				876B52852129F464003E6A82 /* DDGetoptLongParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,7 +451,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 271;
+				CURRENT_PROJECT_VERSION = 272;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -437,7 +481,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 271;
+				CURRENT_PROJECT_VERSION = 272;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -513,6 +557,7 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/DPCIManager/DPCIManager-Info.plist";
 				LD_NO_PIE = YES;
 				OTHER_LDFLAGS = (
 					"-sectcreate",
@@ -531,6 +576,7 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/DPCIManager/DPCIManager-Info.plist";
 				LD_NO_PIE = YES;
 				OTHER_LDFLAGS = (
 					"-sectcreate",
