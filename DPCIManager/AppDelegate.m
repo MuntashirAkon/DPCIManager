@@ -86,7 +86,7 @@
 }
 -(IBAction)updateIDs:(id)sender{
     [sender setEnabled:false];
-    if ([URLTask conditionalGet:[NSURL URLWithString:@"http://pci-ids.ucw.cz/pci.ids"] toFile:[NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"]]) {
+    if ([URLTask conditionalGet:[NSURL URLWithString:@"https://pci-ids.ucw.cz/pci.ids"] toFile:[NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"]]) {
         [sender setLabel:@"Found"];
         self.pcis = [pciDevice readIDs];
     }
@@ -96,7 +96,12 @@
 -(IBAction)updateSeed:(id)sender{
     [sender setEnabled:false];
     NSString *version = [[[[NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"] objectForKey:@"ProductVersion"] componentsSeparatedByString:@"."] objectAtIndex:1];
-    if ([URLTask conditionalGet:[NSURL URLWithString:[NSString stringWithFormat:@"http://dpcimanager.sourceforge.net/10.%@/seed.plist", version]] toFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]]) {
+    // No seed if macOS version is greater than 10.10 or less than 10.7
+    if(version.integerValue > 10 || version.integerValue < 7){
+        [sender setLabel:@"N/A"];
+        NSRunCriticalAlertPanel(@"Unsupported macOS version!", @"%@", nil, nil, nil, [NSString stringWithFormat:@"DPCIManager only supports 10.7 through 10.10. You are running 10.%@.", version]);
+    }
+    else if ([URLTask conditionalGet:[NSURL URLWithString:[NSString stringWithFormat:@"http://dpcimanager.sourceforge.net/10.%@/seed.plist", version]] toFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]]) {
         [sender setLabel:@"Found"];
         match = nil;
     }
@@ -220,16 +225,28 @@
     [sender setEnabled:true];
 }
 -(IBAction)install:(id)sender{
+    NSString *version = [[[[NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"] objectForKey:@"ProductVersion"] componentsSeparatedByString:@"."] objectAtIndex:1];
     NSOpenPanel *open = [NSOpenPanel openPanel];
     [open setAllowedFileTypes:@[@"kext"]];
     if ([open runModal] == NSFileHandlingPanelCancelButton) return;
     NSString *kext = open.URL.path;
-    if ([NSFileManager.defaultManager fileExistsAtPath:[kSLE stringByAppendingPathComponent:kext.lastPathComponent]])
+    // Scan SLE first
+    if ([NSFileManager.defaultManager fileExistsAtPath:[kSLE stringByAppendingPathComponent:kext.lastPathComponent]]){
         if (NSRunAlertPanel(@"Kernel Extension Already Exists", @"You are attempting to replace an existing kernel extension, continue?", nil, @"Cancel", nil) != NSAlertDefaultReturn)
             return;
+        [AScript adminExec:[NSString stringWithFormat:@"/bin/rm -r '%@'", [kSLE stringByAppendingPathComponent:[kext.lastPathComponent stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"]]]];
+    }
+    // Scan LE if version is or more 10.11
+    if (version.integerValue >= 11 && [NSFileManager.defaultManager fileExistsAtPath:[kLE stringByAppendingPathComponent:kext.lastPathComponent]]){
+        if (NSRunAlertPanel(@"Kernel Extension Already Exists", @"You are attempting to replace an existing kernel extension, continue?", nil, @"Cancel", nil) != NSAlertDefaultReturn)
+            return;
+        [AScript adminExec:[NSString stringWithFormat:@"/bin/rm -r '%@'", [kLE stringByAppendingPathComponent:[kext.lastPathComponent stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"]]]];
+    }
     [sender setEnabled:false];
     [panel makeKeyAndOrderFront:sender];
-    [AScript adminExec:[NSString stringWithFormat:@"/bin/rm -r '%@';/bin/cp -RX '%@' %@;/usr/bin/touch %@", [kSLE stringByAppendingPathComponent:[kext.lastPathComponent stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"]], [kext stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"], kSLE, kSLE]];
+    // Determine install location (LE or SLE)
+    NSString *location = version.integerValue >= 11 ? kLE : kSLE;
+    [AScript adminExec:[NSString stringWithFormat:@"/bin/cp -RX '%@' %@;/usr/bin/touch %@", [kext stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"], location, location]];
     [sender setEnabled:true];
 }
 -(IBAction)fetchCMOS:(id)sender{

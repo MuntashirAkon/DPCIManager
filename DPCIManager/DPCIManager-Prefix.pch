@@ -6,6 +6,7 @@
     #import <Cocoa/Cocoa.h>
 #endif
 #define kSLE @"/System/Library/Extensions"
+#define kLE  @"/Library/Extensions"
 #define SHOWFILE(x) [[NSWorkspace sharedWorkspace] selectFile:x inFileViewerRootedAtPath:x.stringByDeletingLastPathComponent]
 #define assignWithNotice(x,y,z) [x willChangeValueForKey:@""#y];y=z;[x didChangeValueForKey:@""#y];
 #define muteWithNotice(x,y,z) [x willChangeValueForKey:@""#y];z;[x didChangeValueForKey:@""#y];
