@@ -115,8 +115,9 @@
       @"BDF": [NSString stringWithFormat:@"%02lx:%02lx.%01lx", [[bus objectAtIndex:0] integerValue], [[bus objectAtIndex:1] integerValue], [[bus objectAtIndex:2] integerValue]],
       // Device's Class
       @"Class": @{
-              @"Name": subClassString,
-              @"Code": [NSString stringWithFormat:@"%04lx", pciClassCode.integerValue>>8]
+              @"ClassName": classString,
+              @"SubclassName": subClassString,
+              @"ID": [NSString stringWithFormat:@"%04lx", pciClassCode.integerValue>>8]
       },
       // Device Info
       @"Info": @{

@@ -29,8 +29,7 @@
  * A option parsing exception. This should cause the program to
  * terminate with the given exit code.
  */
-@interface DDCliParseException : NSException
-{
+@interface DDCliParseException : NSException {
     @private
     int _exitCode;
 }
@@ -42,8 +41,7 @@
  * @param exitCode Desired exit code
  * @return Autoreleased exception
  */
-+ (DDCliParseException *)parseExceptionWithReason:(NSString *)reason
-                                         exitCode:(int)exitCode;
++ (DDCliParseException *)parseExceptionWithReason:(NSString *)reason exitCode:(int)exitCode;
 
 /**
  * Create a new exception with a given reason and exit code.
@@ -52,8 +50,7 @@
  * @param exitCode Desired exit code
  * @return New exception
  */
-- (id)initWithReason:(NSString *)reason
-            exitCode:(int)exitCode;
+- (id)initWithReason:(NSString *)reason exitCode:(int)exitCode;
 
 /**
  * Returns the desired exit code.

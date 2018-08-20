@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
+		8726C0E9212ABAB5000177BF /* DataTypeHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8726C0E8212ABAB5000177BF /* DataTypeHandler.m */; };
 		876B527321288815003E6A82 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 876B527221288815003E6A82 /* README.md */; };
 		876B52812129F464003E6A82 /* dd_getopt_long-fbsd.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52782129F463003E6A82 /* dd_getopt_long-fbsd.m */; };
 		876B52822129F464003E6A82 /* DDCliApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52792129F463003E6A82 /* DDCliApplication.m */; };
@@ -77,6 +78,9 @@
 /* Begin PBXFileReference section */
 		8716DE1B212854C500C47DE6 /* JSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
 		8716DE1C2128553200C47DE6 /* JSON.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSON.m; sourceTree = "<group>"; };
+		8726C0E7212A9DB3000177BF /* DataTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
+		8726C0E8212ABAB5000177BF /* DataTypeHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataTypeHandler.m; sourceTree = "<group>"; };
+		8726C0EA212ABAC4000177BF /* DataTypeHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataTypeHandler.h; sourceTree = "<group>"; };
 		876B527221288815003E6A82 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		876B52772129F463003E6A82 /* DDCliUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDCliUtil.h; path = ddcli/lib/DDCliUtil.h; sourceTree = SOURCE_ROOT; };
 		876B52782129F463003E6A82 /* dd_getopt_long-fbsd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "dd_getopt_long-fbsd.m"; path = "ddcli/lib/dd_getopt_long-fbsd.m"; sourceTree = SOURCE_ROOT; };
@@ -259,6 +263,9 @@
 				B0F67A841696BDDD0059FD30 /* main.m */,
 				876B52862129F599003E6A82 /* dspci.h */,
 				876B52872129F5BA003E6A82 /* dspci.m */,
+				8726C0E7212A9DB3000177BF /* DataTypes.h */,
+				8726C0E8212ABAB5000177BF /* DataTypeHandler.m */,
+				8726C0EA212ABAC4000177BF /* DataTypeHandler.h */,
 			);
 			path = dspci;
 			sourceTree = "<group>";
@@ -404,6 +411,7 @@
 			files = (
 				8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */,
 				876B52812129F464003E6A82 /* dd_getopt_long-fbsd.m in Sources */,
+				8726C0E9212ABAB5000177BF /* DataTypeHandler.m in Sources */,
 				B0F67A8E1696BE6D0059FD30 /* PCI.m in Sources */,
 				876B52882129F5BA003E6A82 /* dspci.m in Sources */,
 				876B52842129F464003E6A82 /* DDCliUtil.m in Sources */,

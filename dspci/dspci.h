@@ -13,12 +13,10 @@
 
 @interface DSPCI : NSObject <DDCliApplicationDelegate>
 {
+    BOOL _listDataTypes;
     BOOL _json;
     BOOL _version;
     BOOL _help;
-    NSMutableDictionary *classes;
-    NSMutableDictionary *vendors;
-    NSString *fetchDate;
 }
 
 @end
