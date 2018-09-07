@@ -89,5 +89,4 @@ For understanding JSON schema easily, I've . (dot) for objects and [] (square br
 ```
 
 ### License
-- GPLv3 (Original Work by @PHPdev32)
-- MIT (My Works)
+- GPLv2
