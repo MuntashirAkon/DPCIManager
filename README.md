@@ -89,4 +89,4 @@ For understanding JSON schema easily, I've . (dot) for objects and [] (square br
 ```
 
 ### License
-- GPLv3
+- GPLv2
