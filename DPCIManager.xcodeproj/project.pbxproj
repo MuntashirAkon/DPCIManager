@@ -16,7 +16,6 @@
 		876B52842129F464003E6A82 /* DDCliUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B527E2129F464003E6A82 /* DDCliUtil.m */; };
 		876B52852129F464003E6A82 /* DDGetoptLongParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52802129F464003E6A82 /* DDGetoptLongParser.m */; };
 		876B52882129F5BA003E6A82 /* dspci.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52872129F5BA003E6A82 /* dspci.m */; };
-		B00D8CF41685487D00D39BA8 /* FD44Copier in CopyFiles */ = {isa = PBXBuildFile; fileRef = B00D8CF11685486C00D39BA8 /* FD44Copier */; };
 		B02571401601496400B0E1EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025713F1601496400B0E1EB /* Cocoa.framework */; };
 		B025714C1601496400B0E1EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B025714B1601496400B0E1EB /* main.m */; };
 		B02571531601496400B0E1EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B02571521601496400B0E1EB /* AppDelegate.m */; };
@@ -24,39 +23,15 @@
 		B025716816018CF000B0E1EB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025716716018CF000B0E1EB /* IOKit.framework */; };
 		B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */ = {isa = PBXBuildFile; fileRef = B025716916018D0600B0E1EB /* DPCIManager.icns */; };
 		B025716C16018D9600B0E1EB /* pci.ids in Resources */ = {isa = PBXBuildFile; fileRef = B025716B16018D9600B0E1EB /* pci.ids */; };
-		B04E48B016786E5200CB42AA /* superiotool in CopyFiles */ = {isa = PBXBuildFile; fileRef = B04E489D167861FB00CB42AA /* superiotool */; };
 		B05AE9BC162A500B005190E4 /* Task.m in Sources */ = {isa = PBXBuildFile; fileRef = B05AE9BB162A500B005190E4 /* Task.m */; };
-		B066CC84167476E900A38FCE /* dmidecode in CopyFiles */ = {isa = PBXBuildFile; fileRef = B066CC81167476CD00A38FCE /* dmidecode */; };
 		B07193831623B776006D5666 /* PCI.m in Sources */ = {isa = PBXBuildFile; fileRef = B07193821623B776006D5666 /* PCI.m */; };
-		B07B432F165B74D900B68837 /* PMPatch in CopyFiles */ = {isa = PBXBuildFile; fileRef = B07B4328165B745200B68837 /* PMPatch */; };
 		B08396ED1627F137003427F4 /* Match.m in Sources */ = {isa = PBXBuildFile; fileRef = B08396EC1627F137003427F4 /* Match.m */; };
 		B09012811705921600D0F913 /* Hardware.m in Sources */ = {isa = PBXBuildFile; fileRef = B09012801705921600D0F913 /* Hardware.m */; };
-		B0901284170596F200D0F913 /* Flash.m in Sources */ = {isa = PBXBuildFile; fileRef = B0901283170596F100D0F913 /* Flash.m */; };
-		B0970F0C1628CB8600C1AB8A /* seed.plist in Resources */ = {isa = PBXBuildFile; fileRef = B0970F0B1628CB8600C1AB8A /* seed.plist */; };
-		B0B996A8162B678500EA1285 /* DirectHW.kext in Resources */ = {isa = PBXBuildFile; fileRef = B0B996A7162B678500EA1285 /* DirectHW.kext */; };
-		B0B996AC162B681F00EA1285 /* flashrom in CopyFiles */ = {isa = PBXBuildFile; fileRef = B0B996A9162B680E00EA1285 /* flashrom */; };
 		B0F67A821696BDDD0059FD30 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0F67A811696BDDD0059FD30 /* Foundation.framework */; };
 		B0F67A851696BDDD0059FD30 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F67A841696BDDD0059FD30 /* main.m */; };
 		B0F67A8E1696BE6D0059FD30 /* PCI.m in Sources */ = {isa = PBXBuildFile; fileRef = B07193821623B776006D5666 /* PCI.m */; };
 		B0F67A8F1696BEA40059FD30 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B025716716018CF000B0E1EB /* IOKit.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		B0683AA117AF50DB003A10CB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B02571321601496300B0E1EB /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B0683A9D17AF4EE7003A10CB;
-			remoteInfo = "PCI IDs";
-		};
-		B0683AA317AF50E2003A10CB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B02571321601496300B0E1EB /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B0683A9D17AF4EE7003A10CB;
-			remoteInfo = "PCI IDs";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		B0B996AB162B681700EA1285 /* CopyFiles */ = {
@@ -65,11 +40,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				B0B996AC162B681F00EA1285 /* flashrom in CopyFiles */,
-				B00D8CF41685487D00D39BA8 /* FD44Copier in CopyFiles */,
-				B07B432F165B74D900B68837 /* PMPatch in CopyFiles */,
-				B066CC84167476E900A38FCE /* dmidecode in CopyFiles */,
-				B04E48B016786E5200CB42AA /* superiotool in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,7 +64,6 @@
 		876B52802129F464003E6A82 /* DDGetoptLongParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDGetoptLongParser.m; path = ddcli/lib/DDGetoptLongParser.m; sourceTree = SOURCE_ROOT; };
 		876B52862129F599003E6A82 /* dspci.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dspci.h; sourceTree = "<group>"; };
 		876B52872129F5BA003E6A82 /* dspci.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = dspci.m; sourceTree = "<group>"; };
-		B00D8CF11685486C00D39BA8 /* FD44Copier */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = FD44Copier; sourceTree = SOURCE_ROOT; };
 		B025713B1601496400B0E1EB /* DPCIManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DPCIManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B025713F1601496400B0E1EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		B02571421601496400B0E1EB /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -109,24 +78,16 @@
 		B025716716018CF000B0E1EB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		B025716916018D0600B0E1EB /* DPCIManager.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = DPCIManager.icns; sourceTree = SOURCE_ROOT; };
 		B025716B16018D9600B0E1EB /* pci.ids */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pci.ids; sourceTree = SOURCE_ROOT; };
-		B04E489D167861FB00CB42AA /* superiotool */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = superiotool; sourceTree = SOURCE_ROOT; };
 		B051DE22160682A4005CC4B6 /* Tables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tables.h; sourceTree = "<group>"; };
 		B051DE2416068316005CC4B6 /* License.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = License.h; sourceTree = "<group>"; };
 		B05AE9BA162A500B005190E4 /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
 		B05AE9BB162A500B005190E4 /* Task.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = Task.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		B066CC81167476CD00A38FCE /* dmidecode */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = dmidecode; sourceTree = SOURCE_ROOT; };
 		B07193811623B776006D5666 /* PCI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PCI.h; sourceTree = "<group>"; };
 		B07193821623B776006D5666 /* PCI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PCI.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		B07B4328165B745200B68837 /* PMPatch */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = PMPatch; sourceTree = SOURCE_ROOT; };
 		B08396EB1627F137003427F4 /* Match.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Match.h; sourceTree = "<group>"; };
 		B08396EC1627F137003427F4 /* Match.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Match.m; sourceTree = "<group>"; };
 		B090127F1705921600D0F913 /* Hardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hardware.h; sourceTree = "<group>"; };
 		B09012801705921600D0F913 /* Hardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hardware.m; sourceTree = "<group>"; };
-		B0901282170596F100D0F913 /* Flash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flash.h; sourceTree = "<group>"; };
-		B0901283170596F100D0F913 /* Flash.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Flash.m; sourceTree = "<group>"; };
-		B0970F0B1628CB8600C1AB8A /* seed.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = seed.plist; sourceTree = SOURCE_ROOT; };
-		B0B996A7162B678500EA1285 /* DirectHW.kext */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.kernel-extension"; name = DirectHW.kext; path = ../DirectHW.kext; sourceTree = "<group>"; };
-		B0B996A9162B680E00EA1285 /* flashrom */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = flashrom; sourceTree = SOURCE_ROOT; };
 		B0F67A7F1696BDDD0059FD30 /* dspci */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dspci; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0F67A811696BDDD0059FD30 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B0F67A841696BDDD0059FD30 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -217,8 +178,6 @@
 			children = (
 				B02571511601496400B0E1EB /* AppDelegate.h */,
 				B02571521601496400B0E1EB /* AppDelegate.m */,
-				B0901282170596F100D0F913 /* Flash.h */,
-				B0901283170596F100D0F913 /* Flash.m */,
 				B090127F1705921600D0F913 /* Hardware.h */,
 				B09012801705921600D0F913 /* Hardware.m */,
 				B08396EB1627F137003427F4 /* Match.h */,
@@ -238,15 +197,8 @@
 		B02571461601496400B0E1EB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				B0970F0B1628CB8600C1AB8A /* seed.plist */,
 				B02571471601496400B0E1EB /* DPCIManager-Info.plist */,
-				B0B996A9162B680E00EA1285 /* flashrom */,
-				B0B996A7162B678500EA1285 /* DirectHW.kext */,
 				B025716916018D0600B0E1EB /* DPCIManager.icns */,
-				B066CC81167476CD00A38FCE /* dmidecode */,
-				B04E489D167861FB00CB42AA /* superiotool */,
-				B00D8CF11685486C00D39BA8 /* FD44Copier */,
-				B07B4328165B745200B68837 /* PMPatch */,
 				B025716B16018D9600B0E1EB /* pci.ids */,
 				B025714B1601496400B0E1EB /* main.m */,
 				B025714D1601496400B0E1EB /* DPCIManager-Prefix.pch */,
@@ -304,7 +256,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B0683AA417AF50E2003A10CB /* PBXTargetDependency */,
 			);
 			name = DPCIManager;
 			productName = DPCIManager;
@@ -321,7 +272,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B0683AA217AF50DB003A10CB /* PBXTargetDependency */,
 			);
 			name = dspci;
 			productName = dspci;
@@ -334,7 +284,7 @@
 		B02571321601496300B0E1EB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "";
 			};
 			buildConfigurationList = B02571351601496300B0E1EB /* Build configuration list for PBXProject "DPCIManager" */;
@@ -365,8 +315,6 @@
 				B02571561601496400B0E1EB /* MainMenu.xib in Resources */,
 				B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */,
 				B025716C16018D9600B0E1EB /* pci.ids in Resources */,
-				B0970F0C1628CB8600C1AB8A /* seed.plist in Resources */,
-				B0B996A8162B678500EA1285 /* DirectHW.kext in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,7 +349,6 @@
 				B08396ED1627F137003427F4 /* Match.m in Sources */,
 				B05AE9BC162A500B005190E4 /* Task.m in Sources */,
 				B09012811705921600D0F913 /* Hardware.m in Sources */,
-				B0901284170596F200D0F913 /* Flash.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,19 +371,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		B0683AA217AF50DB003A10CB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B0683A9D17AF4EE7003A10CB /* PCI IDs */;
-			targetProxy = B0683AA117AF50DB003A10CB /* PBXContainerItemProxy */;
-		};
-		B0683AA417AF50E2003A10CB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B0683A9D17AF4EE7003A10CB /* PCI IDs */;
-			targetProxy = B0683AA317AF50E2003A10CB /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		B02571541601496400B0E1EB /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
@@ -453,16 +387,34 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 272;
+				CURRENT_PROJECT_VERSION = 286;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -471,7 +423,9 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
@@ -483,20 +437,39 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 272;
+				CURRENT_PROJECT_VERSION = 286;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
@@ -510,6 +483,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "DPCIManager/DPCIManager-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -522,6 +496,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "DPCIManager/DPCIManager-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -573,6 +548,7 @@
 					__pci_ids,
 					pci.ids,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -592,6 +568,7 @@
 					__pci_ids,
 					pci.ids,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -12,7 +12,6 @@
 @interface AppDelegate (HardwareAdditions)
 
 +(void)acpitables:(NSString *)only;
-+(bool)checkDirect;
 +(NSString *)bdmesg;
 +(NSDictionary *)readHardware;
 +(NSURL *)findKext:(NSString *)bundle;

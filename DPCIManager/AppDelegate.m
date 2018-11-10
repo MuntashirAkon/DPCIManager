@@ -93,39 +93,6 @@
     else
         [sender setLabel:@"None"];
 }
--(IBAction)updateSeed:(id)sender{
-    [sender setEnabled:false];
-    NSString *version = [[[[NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"] objectForKey:@"ProductVersion"] componentsSeparatedByString:@"."] objectAtIndex:1];
-    // No seed if macOS version is greater than 10.10 or less than 10.7
-    if(version.integerValue > 10 || version.integerValue < 7){
-        [sender setLabel:@"N/A"];
-        NSRunCriticalAlertPanel(@"Unsupported macOS version!", @"%@", nil, nil, nil, [NSString stringWithFormat:@"DPCIManager only supports 10.7 through 10.10. You are running 10.%@.", version]);
-    }
-    else if ([URLTask conditionalGet:[NSURL URLWithString:[NSString stringWithFormat:@"http://dpcimanager.sourceforge.net/10.%@/seed.plist", version]] toFile:[NSBundle.mainBundle pathForResource:@"seed" ofType:@"plist"]]) {
-        [sender setLabel:@"Found"];
-        match = nil;
-    }
-    else
-        [sender setLabel:@"None"];
-}
--(IBAction)submit:(id)sender{
-    [sender setEnabled:false];
-    NSMutableArray *pciids = [NSMutableArray array];
-    for(pciDevice *dev in pcis)
-        [pciids addObject:[NSString stringWithFormat:@"id[]=%04lX,%04lX,%04lX,%04lX,%06lX", dev.shadowVendor.integerValue, dev.shadowDevice.integerValue, dev.subVendor.integerValue, dev.subDevice.integerValue, dev.pciClassCode.integerValue]];
-    NSString *postData = [pciids componentsJoinedByString:@"&"];
-    NSMutableURLRequest *DPCIReceiver = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://dpcimanager.sourceforge.net/receiver"]];
-    [DPCIReceiver setHTTPMethod:@"POST"];
-    [DPCIReceiver addValue: @"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-    [DPCIReceiver setValue:[NSString stringWithFormat: @"%lu", postData.length] forHTTPHeaderField:@"Content-Length"];
-    [DPCIReceiver setHTTPBody: [postData dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:true]];
-    [NSURLConnection sendAsynchronousRequest:DPCIReceiver queue:NSOperationQueue.currentQueue completionHandler:^void(NSURLResponse *response, NSData *data, NSError *err){
-        if (!err)
-            [sender setLabel:([(NSHTTPURLResponse *)response statusCode] == 200)?@"Success":@"Failed"];
-        else
-            ModalError(err);
-    }];
-}
 -(IBAction)dumpTables:(id)sender{
     [AppDelegate acpitables:nil];
 }
@@ -176,42 +143,6 @@
         IOObjectRelease(service);
     }
 }
--(IBAction)patchNode:(id)sender{
-    if ([sender tag] < 2) {
-        NSInteger i = [[patch substringWithRange:NSMakeRange(2, 1)] integerValue]&(0b11<<(![sender tag]?0:2));
-        i |= [[sender selectedItem] tag]<<(![sender tag]?2:0);
-        self.patch = [patch stringByReplacingCharactersInRange:NSMakeRange(2, 1) withString:[NSString stringWithFormat:@"%01lX", i]];
-        if ([sender tag] == 1) {
-            i=0;
-            [nodeLocation removeAllItems];
-            for (NSString *choice in [@[@[@"N/A", @"Rear", @"Front", @"Left", @"Right", @"Top", @"Bottom", @"Rear Panel", @"Drive Bay"], @[@"N/A", @"", @"", @"", @"", @"", @"", @"Riser", @"Digital Display", @"ATAPI"], @[@"N/A", @"Rear", @"Front", @"Left", @"Right", @"Top", @"Bottom"], @[@"N/A", @"", @"", @"", @"", @"", @"Bottom", @"Inside Lid", @"Outside Lid"]] objectAtIndex:[[sender selectedItem] tag]]) {
-                if (!choice.length) {
-                    i++;
-                    continue;
-                }
-                NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:choice action:NULL keyEquivalent:@""];
-                [item setTag:i++];
-                [[nodeLocation menu] addItem:item];
-            }
-            [nodeLocation selectItemAtIndex:0];
-            [self patchNode:nodeLocation];
-        }
-    }
-    else
-        self.patch = [patch stringByReplacingCharactersInRange:NSMakeRange([sender tag]+1, 1) withString:[NSString stringWithFormat:@"%lX", [[sender selectedItem] tag]]];
-}
--(IBAction)pstates:(id)sender{
-    if (cond.condition) {
-        [cond setCondition:2];
-        return;
-    }
-    if (![AppDelegate checkDirect]) return;
-    [sender setEnabled:false];
-    [panel makeKeyAndOrderFront:sender];
-    [cond setCondition:1];
-    [self performSelectorInBackground:@selector(logStates:) withObject:sender];
-    [sender setEnabled:true];
-}
 -(IBAction)repair:(id)sender{
     [sender setEnabled:false];
     [panel makeKeyAndOrderFront:sender];//FIXME: more efficient process
@@ -248,23 +179,6 @@
     NSString *location = version.integerValue >= 11 ? kLE : kSLE;
     [AScript adminExec:[NSString stringWithFormat:@"/bin/cp -RX '%@' %@;/usr/bin/touch %@", [kext stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"], location, location]];
     [sender setEnabled:true];
-}
--(IBAction)fetchCMOS:(id)sender{
-    NSRange range = NSMakeRange(0, 128);
-    unsigned char buff[range.length];
-    NSMutableData *cmos = [NSMutableData data];
-    io_service_t service;
-    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleRTC")))) {
-        io_connect_t connect;
-        if (IOServiceOpen(service, mach_task_self(), 0x0101FACE, &connect) == KERN_SUCCESS){
-            while(IOConnectCallMethod(connect, 0, (uint64_t *)&range.location, 1, NULL, 0, NULL, NULL, buff, &range.length) == KERN_SUCCESS) {
-                [cmos appendBytes:buff length:range.length];
-                range.location += 128;
-            }
-            IOServiceClose(connect);
-        }
-        IOObjectRelease(service);
-    }
 }
 -(IBAction)ethString:(id)sender{
     if ([sender selectedRow] == -1) return;
@@ -304,41 +218,6 @@
     }
 }
 #pragma mark Logging
--(void)logStates:(id)sender{
-    io_service_t service;
-    if ((service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("DirectHWService")))) {
-        NSUInteger frequency = 10;
-        NSMutableSet *states = [NSMutableSet set];
-        io_connect_t connect;
-        if (IOServiceOpen(service, mach_task_self(), 0, &connect) == KERN_SUCCESS) {
-            NSUInteger i = 0;
-            msrcmd_t in = {0, 0x198}, out;
-            size_t size = sizeof(msrcmd_t);
-            kern_return_t ret;
-            while (cond.condition != 2) {
-                usleep(kMillisecondScale/frequency);
-                if ((ret = IOConnectCallStructMethod(connect, 3, &in, size, &out, &size)) != KERN_SUCCESS) {
-                    if (ret == kIOReturnIOError && frequency > 1) {
-                        [self logLine:[@"P States: I/O error, throttling to " stringByAppendingFormat:@"%ldHz", --frequency]];
-                        continue;
-                    }
-                    [self logLine:[NSString stringWithFormat:@"P States: method failed, exiting 0x%X", ret]];
-                    break;
-                }
-                NSNumber *state = [NSNumber numberWithInteger:(!(out.lo&0xFF)) ? out.lo>>8&0xFF : out.lo&0xFF];
-                [states addObject:state];
-                if (!(i++ % (5*frequency))) {
-                    [self logLine:[NSString stringWithFormat:@"P States: %@", [[states.allObjects sortedArrayUsingSelector:@selector(compare:)] componentsJoinedByString:@", "]]];
-                    [self logLine:[NSString stringWithFormat:@"Current State: %@", state]];
-                }
-            }
-            IOServiceClose(connect);
-        }
-        IOObjectRelease(service);
-    }
-    [[sender toolbar] setSelectedItemIdentifier:nil];
-    [cond setCondition:0];
-}
 -(void)readLog:(NSData *)data{
     [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] enumerateLinesUsingBlock:^(NSString *line, BOOL *stop){
         if ([line rangeOfString:@"kextd"].location != NSNotFound || [line rangeOfString:@"kextcache"].location != NSNotFound || [line rangeOfString:@"DirectHW"].location != NSNotFound || [line rangeOfString:@"Repair Permissions"].location != NSNotFound)

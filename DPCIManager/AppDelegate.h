@@ -34,18 +34,13 @@ typedef struct {
 @property NSDictionary *status;
 
 -(IBAction)updateIDs:(id)sender;
--(IBAction)updateSeed:(id)sender;
--(IBAction)submit:(id)sender;
 -(IBAction)dumpTables:(id)sender;
 -(IBAction)dumpDsdt:(id)sender;
 -(IBAction)ethString:(id)sender;
 -(IBAction)fetchKext:(id)sender;
--(IBAction)patchNode:(id)sender;
--(IBAction)pstates:(id)sender;
 -(IBAction)repair:(id)sender;
 -(IBAction)rebuild:(id)sender;
 -(IBAction)install:(id)sender;
--(IBAction)fetchCMOS:(id)sender;
 -(void)logTask:(NSData *)data;
 
 @end

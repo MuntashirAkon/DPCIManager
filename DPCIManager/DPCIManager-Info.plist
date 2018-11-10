@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>DPCIManager</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.sourceforge.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -26,27 +26,27 @@
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Licensed under GPLv3, full text at http://www.gnu.org/licenses/gpl-3.0.txt</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>sourceforge.net</key>
 			<dict>
-				<key>NSTemporaryExceptionMinimumTLSVersion</key>
-				<string>TLSv1.1</string>
-				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
 				<key>NSIncludesSubdomains</key>
 				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.1</string>
 			</dict>
 		</dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<false/>
 	</dict>
+	<key>NSHumanReadableCopyright</key>
+	<string>Licensed under GPLv3, full text at http://www.gnu.org/licenses/gpl-3.0.txt</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

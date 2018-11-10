@@ -34,44 +34,6 @@
         IOObjectRelease(expert);
     }
 }
-+(bool)checkDirect{
-    NSUInteger safemode = 1, len = 4;
-    if (sysctlbyname("kern.safeboot", &safemode, &len, NULL, 0) == 0 && safemode) {
-        NSRunCriticalAlertPanel(@"Safe Mode Detected", @"DPCIManager has detected Safe Mode, and will be unable to load DirectHW during this session, task will now exit.", nil, nil, nil);
-        return false;
-    }
-    bool check = [[[(__bridge_transfer NSDictionary *)KextManagerCopyLoadedKextInfo((__bridge CFArrayRef)@[kDirectHWIdentifier], (__bridge CFArrayRef)@[kOSBundleStarted]) objectForKey:kDirectHWIdentifier] objectForKey:kOSBundleStarted] boolValue];
-    if (!check) {
-        [AScript loadKext:[NSBundle.mainBundle pathForResource:@"DirectHW" ofType:@"kext"]];
-        check = [[[(__bridge_transfer NSDictionary *)KextManagerCopyLoadedKextInfo((__bridge CFArrayRef)@[kDirectHWIdentifier], (__bridge CFArrayRef)@[kOSBundleStarted]) objectForKey:kDirectHWIdentifier] objectForKey:kOSBundleStarted] boolValue];
-    }
-    if (check && ![(AppDelegate *)[NSApp delegate] report]) {
-        NSDictionary *addrs = [URLTask getMACs];
-        if ([addrs.allValues containsObject:kStubMAC])
-            [[NSAlert alertWithMessageTextAndView:@"Bad MAC Address" defaultButton:nil alternateButton:nil otherButton:nil accessoryView:[NSAlert hyperlink:@"http://bit.ly/Tg8el9" title:@"Tools to flash and recover BIOS on ASUS P8xxx boards"] informativeTextWithFormat:@"A bad MAC address (%@) was detected on one or more ethernet interfaces, likely the result of an incomplete ASUS BIOS update.", kStubMAC] runModal];
-        NSCharacterSet *white = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-        NSString *dmidecode = [NSBundle.mainBundle pathForAuxiliaryExecutable:@"dmidecode"], *board = [[NSTask launchAndOut:dmidecode args:@[@"-s", @"baseboard-product-name"]] stringByTrimmingCharactersInSet:white];
-        if (!board.length || [board rangeOfString:@"Stop."].location != NSNotFound) {
-            [(AppDelegate *)[NSApp delegate] setReport:[@{@"dmi":@"", @"socket":@0, @"addrs":addrs, @"chassis":@""} mutableCopy]];
-            NSRunCriticalAlertPanel(@"DMIDecode Error Detected", @"DPCIManager has detected a dmidecode error, and will be unable to fetch your motherboard's information for this task. Please exercise caution.", nil, nil, nil);
-            return true;
-        }
-        NSString *version = [[NSTask launchAndOut:dmidecode args:@[@"-s", @"bios-version"]] stringByTrimmingCharactersInSet:white], *manufacturer = [[NSTask launchAndOut:dmidecode args:@[@"-s", @"baseboard-manufacturer"]] stringByTrimmingCharactersInSet:white], *chassis = [[NSTask launchAndOut:dmidecode args:@[@"-s", @"chassis-type"]] stringByTrimmingCharactersInSet:white];
-        if ([board rangeOfString:@"\n"].location != NSNotFound) {
-            board = [[[board componentsSeparatedByString:@"\n"] lastObject] stringByTrimmingCharactersInSet:white];
-            version = [[[version componentsSeparatedByString:@"\n"] lastObject] stringByTrimmingCharactersInSet:white];
-            manufacturer = [[[manufacturer componentsSeparatedByString:@"\n"] lastObject] stringByTrimmingCharactersInSet:white];//FIXME: check laptop in a NULL flashrom task?
-            chassis = [[[chassis componentsSeparatedByString:@"\n"] lastObject] stringByTrimmingCharactersInSet:white];
-        }
-        if ([@[@"Portable", @"Laptop", @"Notebook", @"Hand Held", @"Sub Notebook"] indexOfObject:chassis] != NSNotFound)
-            NSRunCriticalAlertPanel(@"Laptops Not Supported", @"Flashrom does not currently support '%@' and any flashing task will likely fail immediately. Please exercise caution.", nil, nil, nil, chassis);
-        manufacturer = [[[manufacturer componentsSeparatedByString:@" "] objectAtIndex:0] stringByTrimmingCharactersInSet:white];
-        NSString *socket = [NSTask launchAndOut:dmidecode args:@[@"-t", @"processor"]];
-        NSRange range = [[NSRegularExpression regularExpressionWithPattern:@"Socket Designation: .*\\d{4}" options:0 error:nil] rangeOfFirstMatchInString:socket options:0 range:NSMakeRange(0, socket.length)];
-        [(AppDelegate *)[NSApp delegate] setReport:[@{@"dmi":[NSString stringWithFormat:@"%@ %@ %@", manufacturer, board, version], @"socket":(range.location == NSNotFound)?@0:@([[socket substringWithRange:NSMakeRange(NSMaxRange(range)-4, 4)] integerValue]), @"addrs":addrs, @"chassis":chassis} mutableCopy]];
-    }
-    return check;
-}
 +(NSURL *)findKext:(NSString *)bundle {
     return (__bridge_transfer NSURL *)KextManagerCreateURLForBundleIdentifier(kCFAllocatorDefault, (__bridge CFStringRef)bundle);
 }
@@ -205,7 +167,7 @@
 +(NSArray *)listNetwork{
     NSMutableArray *temp = [NSMutableArray array];
     io_iterator_t itThis;
-    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOEthernetInterface"), &itThis) == KERN_SUCCESS) {
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IONetworkInterface"), &itThis) == KERN_SUCCESS) {
         io_service_t service;
         while((service = IOIteratorNext(itThis))){
             io_service_t parent;
@@ -351,5 +313,19 @@
     return [temp copy];
 }
 
+static NSRegularExpression *macregex;
+static NSRegularExpression *optest;
+
++(void)initialize {
+    macregex = [NSRegularExpression regularExpressionWithPattern:@"[A-F0-9]{2}:[A-F0-9]{2}:[A-F0-9]{2}:[A-F0-9]{2}:[A-F0-9]{2}:[A-F0-9]{2}" options:0 error:nil];
+    optest = [NSRegularExpression regularExpressionWithPattern:@"UNTESTED for operations: ([A-Z ]+)\\n" options:0 error:nil];
+}
+
+#pragma mark Logging
+-(void)logReport:(NSData *)data{
+    if (!self.flashout) self.flashout = [NSMutableData data];
+    [self.flashout appendData:data];
+    [self logTask:data];
+}
 
 @end
