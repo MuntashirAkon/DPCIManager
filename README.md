@@ -1,14 +1,13 @@
 # DPCIManager
 Simple OS X app for viewing PCI hardware info
 
-**NOTE:** I'll only provide support for `dspci` tool, NOT `DPCIManager.app` (I'll update PCI IDs occassionally, however).
-  But I'am still keeping it in case someone is interested in contributing.
-
 ### Binaries
 You can find the [latest binary](https://github.com/MuntashirAkon/DPCIManager/releases/latest)
 in the [release](https://github.com/MuntashirAkon/DPCIManager/releases) section.
 
 Old binaries can be found here: https://sourceforge.net/projects/dpcimanager/files
+
+**NOTE:** The binary files contain `DirectHW.kext` which might lead your antivirus program to believe that this application contains a virus. Please white-list this app in your antivirus program.
 
 ### Usage (for `dspci`)
 If you're running version `1.6`, see usage [here](https://github.com/MuntashirAkon/DPCIManager/blob/e302cd9ce6f62d90d5da627cccc14cb088696444/README.md#usage-for-dspci).
@@ -22,7 +21,7 @@ dspci --help
 For `1.6`, see [old schema](https://github.com/MuntashirAkon/DPCIManager/blob/e302cd9ce6f62d90d5da627cccc14cb088696444/README.md#json-schema).
 
 An output contains an array of objects which have the following attributes. 
-For understanding JSON schema easily, I've . (dot) for objects and [] (square brackets) for arrays:
+For understanding JSON schema easily, I've used . (dot) for objects and [] (square brackets) for arrays:
 
 * `BDF`: (String) Bus number, Device number, Function number (Format `B:D.F`)
 * `Class`: (Object) Device's class
