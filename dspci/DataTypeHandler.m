@@ -70,6 +70,18 @@
             [self printAudioList];
             //printf("%s\n", [[self listAudio] bv_jsonStringWithPrettyPrint:true].UTF8String);
             break;
+        case DT_LIST_GPU_INT:
+        case DT_LIST_GPU_ID_INT:
+            [self printGPUList];
+            break;
+        case DT_LIST_NETWORK_INT:
+        case DT_LIST_NETWORK_ID_INT:
+            [self printNetworkList];
+            break;
+        case DT_LIST_CONNECTED_INT:
+        case DT_LIST_CONNECTED_ID_INT:
+            [self printConnectedList];
+            break;
         default:
             @throw [DDCliParseException parseExceptionWithReason:[NSString stringWithFormat:@"Invalid data type.\nUse `%@ --listDataTypes` to get a list of possible data types.", DDCliApp]  exitCode:EX_DATAERR];
     }
@@ -223,16 +235,20 @@
                     [[NSRegularExpression regularExpressionWithPattern:@"Codec ID: 0x([0-9a-f]{8})(?:\n.*){3}Revision: 0x([0-9a-f]{2})\n.*Stepping: 0x([0-9a-f]{2})" options:0 error:nil] enumerateMatchesInString:dump options:0 range:NSMakeRange(0, dump.length) usingBlock:^void(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop){
                         long codecid    = strHexDec([dump substringWithRange:[result rangeAtIndex:1]]),
                              revision   = strHexDec([dump substringWithRange:[result rangeAtIndex:2]]) << 8 | strHexDec([dump substringWithRange:[result rangeAtIndex:3]]);
-                        char *codecname = NULL;
+                        NSString *CodecID = [self insertColonInID:codecid];
+                        NSString *CodecName = nil;
                         for(int n = 0; gCodecList[n].name; n++)
-                            if (HDA_DEV_MATCH(gCodecList[n].id, codecid) && revision >= gCodecList[n].rev) { codecname = gCodecList[n].name; break; }
-                        if (codecname == NULL) codecname = !codecid ? "NULL Codec" : "Unknown Codec";
+                            if (HDA_DEV_MATCH(gCodecList[n].id, codecid) && revision >= gCodecList[n].rev) {
+                                CodecName = [NSString stringWithUTF8String:gCodecList[n].name];
+                                break;
+                            }
+                        if (CodecName == nil) CodecName = !codecid ? @"NULL Codec" : @"Unknown Codec";
                         [hda addObject:@{
                                 @"DeviceID"     : [NSString stringWithFormat:kPCIFormat, audio.vendor.integerValue, audio.device.integerValue],
                                 @"SubdeviceID"  : [NSString stringWithFormat:kPCIFormat, audio.subVendor.integerValue, audio.subDevice.integerValue],
-                                @"CodecID"      : [NSString stringWithFormat:@"%08lX", codecid],
+                                @"CodecID"      : CodecID,
                                 @"Revision"     : [NSString stringWithFormat:@"%04lX", revision],
-                                @"Model"        : [NSString stringWithUTF8String:codecname]
+                                @"Model"        : CodecName
                             }
                         ];
                     }];
@@ -259,11 +275,9 @@
                 while ((child = IOIteratorNext(itChild))){
                     long codecid    = [[pciDevice grabNumber:CFSTR("IOHDACodecVendorID") forService:child] longValue] & 0xFFFFFFFF,
                          revision   = [[pciDevice grabNumber:CFSTR("IOHDACodecRevisionID") forService:child] longValue] & 0xFFFF;
-                    NSMutableString *CodecID = [NSMutableString stringWithFormat:@"%08lX", codecid];
-                    [CodecID insertString:@":" atIndex:4];
+                    NSString *CodecID = [self insertColonInID:codecid];
 //                    NSLog(@"%@", [pciDevice grabNumber:CFSTR("IOHDACodecVendorID") forService:child].stringValue);
                     NSString *CodecName = nil;
-                    NSString *hda_gfx = [pciDevice grabString:CFSTR("hda-gfx") forService:parent];
                     for(int n = 0; gCodecList[n].name; n++)
                         if (HDA_DEV_MATCH(gCodecList[n].id, codecid)) {
                             CodecName = [NSString stringWithUTF8String:gCodecList[n].name];
@@ -275,7 +289,7 @@
                             @"SubdeviceID"  : [NSString stringWithFormat:kPCIFormat, audio.subVendor.integerValue, audio.subDevice.integerValue],
                             @"CodecID"      : CodecID,
                             @"LayoutID"     : [pciDevice grabNumber:CFSTR("layout-id") forService:parent],
-                            @"hda-gfx"      : [hda_gfx substringToIndex:[hda_gfx length]-1],
+                            @"hda-gfx"      : [self removeNullChar:[pciDevice grabString:CFSTR("hda-gfx") forService:parent]],
                             @"Revision"     : [NSString stringWithFormat:@"%04lX", revision],
                             @"Model"        : CodecName
                         }
@@ -314,6 +328,295 @@
         }
     }
     return [temp copy];
+}
+
+- (void) printGPUList {
+    NSArray *GPUs = [self listGraphics];
+    NSMutableArray *GPUList = [NSMutableArray array];
+    for(NSDictionary *GPU in GPUs){
+        [GPUList addObject:[self getGPUInfo:dataType GPU:GPU]];
+    }
+    // Print
+    if(printJSON) printf("%s\n", [GPUList bv_jsonStringWithPrettyPrint:true].UTF8String);
+    else printf("%s\n", [GPUList componentsJoinedByString:@"\n"].UTF8String);
+}
+
+- (id) getGPUInfo: (unsigned) dataType GPU: (NSDictionary *)GPU {
+    switch(dataType) {
+        case DT_LIST_GPU_INT:
+            return GPU;
+        case DT_LIST_GPU_ID_INT:
+            return [GPU valueForKey:@"DeviceID"];
+    }
+    return nil;
+}
+
+- (NSArray *) listGraphics {
+    NSMutableArray *temp = [NSMutableArray array];
+    io_iterator_t itThis;
+    io_service_t service;
+    io_service_t parent;
+    io_name_t name;
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("AtiFbStub"), &itThis) == KERN_SUCCESS) {
+        NSMutableDictionary *card;
+        int ports = 0;
+        unsigned long long old;
+        unsigned long long new;
+        service = 1;
+        while(service) {
+            service = IOIteratorNext(itThis);
+            if (!card && !service) break;
+            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
+            IORegistryEntryGetRegistryEntryID(parent, &new);
+            if (card && new!=old){
+                [card setObject:@(ports) forKey:@"ports"];
+                [temp addObject:[card copy]];
+                card = nil;
+                ports = 0;
+            }
+            if (!card && service) {
+                IORegistryEntryGetRegistryEntryID(parent, &old);
+                IORegistryEntryGetName(service, name);
+                card = [@{
+                          @"DeviceID"       : [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("vendor-id") forService:parent].longValue,[pciDevice grabNumber:CFSTR("device-id") forService:parent].longValue],
+                          @"SubdeviceID"    : [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("subsystem-vendor-id") forService:parent].longValue,[pciDevice grabNumber:CFSTR("subsystem-id") forService:parent].longValue],
+                          @"Revision"       : [NSString stringWithFormat:@"%04lX", [pciDevice grabNumber:CFSTR("revision-id") forService:parent].longValue],
+                          @"Model"          : [pciDevice grabString:CFSTR("model") forService:parent],
+                          // @"Ports"       : <port no>
+                          @"ig-platform-id" : @(name),
+                          @"hda-gfx"        : [self removeNullChar:[pciDevice grabString:CFSTR("hda-gfx") forService:parent]]
+                      } mutableCopy];
+            }
+            ports++;
+            IOObjectRelease(parent);
+            IOObjectRelease(service);
+        }
+        IOObjectRelease(itThis);
+    }
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IONDRVDevice"), &itThis) == KERN_SUCCESS){
+        NSMutableDictionary *card;
+        int ports = 0;
+        unsigned long long old;
+        unsigned long long new;
+        service = 1;
+        while(service) {
+            service = IOIteratorNext(itThis);
+            if (!card && !service) break;
+            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
+            IORegistryEntryGetRegistryEntryID(parent, &new);
+            if (card && new != old){
+                [card setObject:@(ports) forKey:@"ports"];
+                [temp addObject:[card copy]];
+                card = nil;
+                ports = 0;
+            }
+            if (!card && service) {
+                io_service_t child;
+                IORegistryEntryGetChildEntry(service, kIOServicePlane, &child);
+                IORegistryEntryGetRegistryEntryID(parent, &old);
+                IORegistryEntryGetName(child, name);
+                card = [@{
+                          @"DeviceID"       : [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("vendor-id") forService:parent].longValue,[pciDevice grabNumber:CFSTR("device-id") forService:parent].longValue],
+                          @"SubdeviceID"    : [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("subsystem-vendor-id") forService:parent].longValue,[pciDevice grabNumber:CFSTR("subsystem-id") forService:parent].longValue],
+                          @"Revision"       : [NSString stringWithFormat:@"%04lX", [pciDevice grabNumber:CFSTR("revision-id") forService:parent].longValue],
+                          @"Model"          : [pciDevice grabString:CFSTR("model") forService:parent],
+                          // @"Ports"       : <port no>
+                          @"ig-platform-id" : @(name),
+                          @"hda-gfx"        : [self removeNullChar:[pciDevice grabString:CFSTR("hda-gfx") forService:parent]]
+                      } mutableCopy];
+                IOObjectRelease(child);
+            }
+            ports++;
+            IOObjectRelease(parent);
+            IOObjectRelease(service);
+        }
+        IOObjectRelease(itThis);
+    }
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("AppleIntelFramebuffer"), &itThis) == KERN_SUCCESS){
+        NSMutableDictionary *card;
+        int ports = 0;
+        unsigned long long old;
+        unsigned long long new;
+        service = 1;
+        while(service) {
+            service = IOIteratorNext(itThis);
+            if (!card && !service) break;
+            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
+            IORegistryEntryGetRegistryEntryID(parent, &new);
+            if (card && new!=old){
+                [card setObject:@(ports) forKey:@"Ports"];
+                [temp addObject:[card copy]];
+                card = nil;
+                ports = 0;
+            }
+            if (!card && service) {
+                io_service_t child;
+                IORegistryEntryGetChildEntry(parent, kIOServicePlane, &child);
+                IORegistryEntryGetRegistryEntryID(parent, &old);
+                NSUInteger framebuffer = [[pciDevice grabNumber:CFSTR("AAPL,ig-platform-id") forService:parent] longValue];
+                if (framebuffer) sprintf(name, "0x%08lX", framebuffer);
+                else IORegistryEntryGetName(child, name);
+                card = [@{
+                          @"DeviceID"       : [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("vendor-id") forService:parent].longValue,[pciDevice grabNumber:CFSTR("device-id") forService:parent].longValue],
+                          @"SubdeviceID"    : [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("subsystem-vendor-id") forService:parent].longValue,[pciDevice grabNumber:CFSTR("subsystem-id") forService:parent].longValue],
+                          @"Revision"       : [NSString stringWithFormat:@"%04lX", [pciDevice grabNumber:CFSTR("revision-id") forService:parent].longValue],
+                          @"Model"          : [pciDevice grabString:CFSTR("model") forService:parent],
+                          // @"Ports"       : <port no>
+                          @"ig-platform-id" : @(name),
+                          @"hda-gfx"        : [self removeNullChar:[pciDevice grabString:CFSTR("hda-gfx") forService:parent]]
+                        } mutableCopy];
+                IOObjectRelease(child);
+            }
+            ports++;
+            IOObjectRelease(parent);
+            IOObjectRelease(service);
+        }
+        IOObjectRelease(itThis);
+    }
+    return [temp copy];
+}
+
+- (void) printNetworkList {
+    NSArray *NetworkInterfaces = [self listNetwork];
+    NSMutableArray *NetworkInterfaceList = [NSMutableArray array];
+    for(NSDictionary *NetworkInterface in NetworkInterfaces){
+        [NetworkInterfaceList addObject:[self getNetworkInfo:dataType NetworkInt:NetworkInterface]];
+    }
+    // Print
+    if(printJSON) printf("%s\n", [NetworkInterfaceList bv_jsonStringWithPrettyPrint:true].UTF8String);
+    else printf("%s\n", [NetworkInterfaceList componentsJoinedByString:@"\n"].UTF8String);
+}
+
+- (id) getNetworkInfo: (unsigned) dataType NetworkInt: (NSDictionary *)NetworkInt {
+    switch(dataType) {
+        case DT_LIST_NETWORK_INT:
+            return NetworkInt;
+        case DT_LIST_NETWORK_ID_INT:
+            return [NetworkInt valueForKey:@"DeviceID"];
+    }
+    return nil;
+}
+
+- (NSArray *) listNetwork {
+    NSMutableArray *temp = [NSMutableArray array];
+    io_iterator_t itThis;
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IONetworkInterface"), &itThis) == KERN_SUCCESS) {
+        io_service_t service;
+        while((service = IOIteratorNext(itThis))){
+            io_service_t parent;
+            io_service_t device;
+            IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
+            IORegistryEntryGetParentEntry(parent, kIOServicePlane, &device);
+            NSString *DeviceID;
+            if (![pciDevice isPCI:device]) {
+                // Not a PCI device
+                io_service_t device2;
+                IORegistryEntryGetParentEntry(device, kIOServicePlane, &device2);
+                IOObjectRelease(device);
+                device = 0;
+                if (![pciDevice isPCI:device2]) IOObjectRelease(device2);
+                else device = device2;
+                DeviceID = [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("idProduct") forService:parent].longValue, [pciDevice grabNumber:CFSTR("idVendor") forService:parent].longValue];
+            } else {
+                DeviceID = [self insertColonInStrID:[[pciDevice grabString:CFSTR("IOPCIMatch") forService:parent] substringFromIndex:2]];
+            }
+            NSString *model;
+            io_name_t name;
+            if (!(model = [pciDevice grabString:CFSTR("IOModel") forService:parent]).length) {
+                IORegistryEntryGetName(parent, name);
+                model = [NSString stringWithUTF8String:name];
+            }
+            IOObjectRelease(parent);
+            IORegistryEntryGetName(service, name);//FIXME: better PCI detection
+            [temp addObject:@{
+                      @"Model"  : model,
+                      @"BSD"    : @(name),
+                      @"BuiltIn": [pciDevice grabNumber:CFSTR("IOBuiltin") forService:service],
+                      @"DeviceID" : DeviceID
+                }
+            ];
+            if (device) IOObjectRelease(device);
+            IOObjectRelease(service);
+        }
+        IOObjectRelease(itThis);
+    }
+    return [temp copy];
+}
+
+- (void) printConnectedList {
+    NSArray *ConnectedDevices = [self listConnected];
+    NSMutableArray *ConnectedDeviceList = [NSMutableArray array];
+    for(NSDictionary *ConnectedDevice in ConnectedDevices){
+        [ConnectedDeviceList addObject:[self getConnectedInfo:dataType Connected:ConnectedDevice]];
+    }
+    // Print
+    if(printJSON) printf("%s\n", [ConnectedDeviceList bv_jsonStringWithPrettyPrint:true].UTF8String);
+    else printf("%s\n", [ConnectedDeviceList componentsJoinedByString:@"\n"].UTF8String);
+}
+
+- (id) getConnectedInfo: (unsigned) dataType Connected: (NSDictionary *)Connected {
+    switch(dataType) {
+        case DT_LIST_CONNECTED_INT:
+            return Connected;
+        case DT_LIST_CONNECTED_ID_INT:
+            return [Connected valueForKey:@"DeviceID"];
+    }
+    return nil;
+}
+
+- (NSArray *) listConnected {
+    NSMutableArray *temp = [NSMutableArray array];
+    io_iterator_t itThis;
+    if (IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceMatching("IOUSBDevice"), &itThis) == KERN_SUCCESS) {
+        io_service_t service;
+        while((service = IOIteratorNext(itThis))){
+            NSString *DeviceID;
+            DeviceID = [NSString stringWithFormat:kPCIFormat, [pciDevice grabNumber:CFSTR("idProduct") forService:service].longValue, [pciDevice grabNumber:CFSTR("idVendor") forService:service].longValue];
+            io_name_t name;
+            IORegistryEntryGetName(service, name);
+            [temp addObject:@{
+                              @"ProductName"  : [pciDevice grabString:CFSTR("USB Product Name") forService:service],
+                              @"VendorName"  : [pciDevice grabString:CFSTR("USB Vendor Name") forService:service],
+                              @"Name"    : @(name),
+                              @"BuiltIn": [pciDevice grabNumber:CFSTR("Built-In") forService:service],
+                              @"DeviceID" : DeviceID,
+                              @"PortNumber": [pciDevice grabNumber:CFSTR("PortNum") forService:service],
+                              }
+            ];
+            IOObjectRelease(service);
+        }
+        IOObjectRelease(itThis);
+    }
+    return [temp copy];
+}
+
+
+/**
+ * Insert colon in device id to format it like this: `VendorID:DeviceID`
+ *
+ * @param int_id The given integer
+ 8 @return A string containing the desired format
+ */
+- (NSString *) insertColonInID: (long) int_id {
+    NSMutableString *ID = [NSMutableString stringWithFormat:@"%08lX", int_id];
+    [ID insertString:@":" atIndex:4];
+    return [ID copy];
+}
+
+- (NSString *) insertColonInStrID: (NSString *) str_id {
+    NSMutableString *ID = [NSMutableString stringWithString:str_id];
+    [ID insertString:@":" atIndex:4];
+    return [ID copy];
+}
+
+/**
+ * Some "Data" fields have NULL character at the end, so have to remove it
+ *
+ * @param str The given string containing NULL character
+ * @return A string without the NULL character
+ */
+- (NSString *) removeNullChar: (NSString *) str {
+    return [str substringToIndex:[str length]-1];
 }
 
 @end

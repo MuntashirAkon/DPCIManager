@@ -9,7 +9,7 @@
 #define dspci_h
 
 #import "DDCommandLineInterface.h"
-#define CURRENT_MARKETING_VERSION "1.6"
+#define CURRENT_MARKETING_VERSION "1.8"
 
 @interface DSPCI : NSObject <DDCliApplicationDelegate>
 {

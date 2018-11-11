@@ -17,7 +17,7 @@ As of version `1.7`, you can see usage by running:
 dspci --help
 ```
 
-#### JSON Schema
+#### JSON Schema for default JSON output
 For `1.6`, see [old schema](https://github.com/MuntashirAkon/DPCIManager/blob/e302cd9ce6f62d90d5da627cccc14cb088696444/README.md#json-schema).
 
 An output contains an array of objects which have the following attributes. 

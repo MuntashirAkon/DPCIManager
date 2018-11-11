@@ -40,10 +40,17 @@
 
 - (void) listDataTypes {
     printf("Available data types:\n"
-           "  DTListPCIID                   List only PCI IDs\n"
-           "  DTListAudio                   List audio related info\n"
-           "  DTListAudioID                 List audio device IDs\n"
-           "  DTListAudioCodecID            List audio codec IDs\n"
+           "  DTListPCIID                       List only PCI IDs\n"
+           "  DTListAudio                       List audio related info\n"
+           "  DTListAudioID                     List audio device IDs\n"
+           "  DTListAudioCodecID                List audio codec IDs\n"
+           "  DTListAudioCodecIDWithRevision    List audio codec IDs\n"
+           "  DTListGPU                         List GPU related info\n"
+           "  DTListGPUID                       List GPU only IDs\n"
+           "  DTListNetwork                     List network devices\n"
+           "  DTListNetworkID                   List network device IDs\n"
+           "  DTListConnected                   List connected devices via USB\n"
+           "  DTListConnectedID                 List connected device IDs via USB\n"
            "\n"
            "By default, all the PCI device info will be printed.\n");
 }
@@ -52,7 +59,7 @@
     DDGetoptOption optionTable[] = {
         // Long             Short   Argument options
         {"listDataTypes",   'l',     DDGetoptNoArgument},
-        {"json",             0,      DDGetoptNoArgument},
+        {"json",            'j',     DDGetoptNoArgument},
         {"version",          0,      DDGetoptNoArgument},
         {"help",            'h',     DDGetoptNoArgument},
         {"",                 0,      0},

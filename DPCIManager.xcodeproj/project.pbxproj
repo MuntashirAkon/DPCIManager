@@ -408,7 +408,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 286;
+				CURRENT_PROJECT_VERSION = 287;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -458,7 +458,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_MARKETING_VERSION = 1.6;
-				CURRENT_PROJECT_VERSION = 286;
+				CURRENT_PROJECT_VERSION = 287;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -480,10 +480,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_MARKETING_VERSION = 1.8;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "DPCIManager/DPCIManager-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.muntashirakon.DPCIManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -493,10 +494,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_MARKETING_VERSION = 1.8;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "DPCIManager/DPCIManager-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.muntashirakon.DPCIManager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -538,6 +540,7 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
+				CURRENT_MARKETING_VERSION = 1.8;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/DPCIManager/DPCIManager-Info.plist";
@@ -548,7 +551,7 @@
 					__pci_ids,
 					pci.ids,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.muntashirakon.dspci;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -558,6 +561,7 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
+				CURRENT_MARKETING_VERSION = 1.8;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/DPCIManager/DPCIManager-Info.plist";
@@ -568,7 +572,7 @@
 					__pci_ids,
 					pci.ids,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.muntashirakon.dspci;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -13,7 +13,6 @@
 #import <IOKit/kext/KextManager.h>
 #import <sys/sysctl.h>
 #define kPCIFormat @"0x%04lX%04lX"
-#define kDirectHWIdentifier @"com.coresystems.driver.DirectHW"
 #define kOSBundleStarted @"OSBundleStarted"
 
 @implementation AppDelegate (HardwareAdditions)

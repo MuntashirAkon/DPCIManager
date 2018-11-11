@@ -1055,7 +1055,7 @@
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1608">
                         <rect key="frame" x="0.0" y="0.0" width="655" height="177"/>
-                        <clipView key="contentView" id="4Sy-cz-lrQ">
+                        <clipView key="contentView" copiesOnScroll="NO" id="4Sy-cz-lrQ">
                             <rect key="frame" x="1" y="0.0" width="653" height="176"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
@@ -1063,7 +1063,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="653" height="153"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
                                         <tableColumn editable="NO" width="147" minWidth="40" maxWidth="1000" id="1613">
@@ -1137,6 +1137,7 @@
                     <constraint firstItem="1608" firstAttribute="centerX" secondItem="1607" secondAttribute="centerX" id="2441"/>
                 </constraints>
             </view>
+            <point key="canvasLocation" x="142" y="483"/>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
@@ -1210,7 +1211,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="293" height="131"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
                                     <tableColumn editable="NO" width="290" minWidth="16" maxWidth="1000" id="1684">
@@ -1324,6 +1325,7 @@
                 <constraint firstAttribute="trailing" secondItem="1733" secondAttribute="trailing" constant="9" id="1800"/>
                 <constraint firstItem="1699" firstAttribute="centerY" secondItem="1733" secondAttribute="centerY" id="1801"/>
             </constraints>
+            <point key="canvasLocation" x="142" y="293"/>
         </customView>
     </objects>
     <resources>
