@@ -1,13 +1,15 @@
 # DPCIManager
 Simple OS X app for viewing PCI hardware info
 
+The [original source code](https://sourceforge.net/projects/dpcimanager) was from @phpdev32 
+
 ### Binaries
 You can find the [latest binary](https://github.com/MuntashirAkon/DPCIManager/releases/latest)
 in the [release](https://github.com/MuntashirAkon/DPCIManager/releases) section.
 
 Old binaries can be found here: https://sourceforge.net/projects/dpcimanager/files
 
-**NOTE:** The binary files contain `DirectHW.kext` which might lead your antivirus program to believe that this application contains a virus. Please white-list this app in your antivirus program.
+**NOTE:** The old binary files contain `DirectHW.kext` which might lead your antivirus program to believe that this application contains a virus. Please white-list this app in your antivirus program.
 
 ### Usage (for `dspci`)
 If you're running version `1.6`, see usage [here](https://github.com/MuntashirAkon/DPCIManager/blob/e302cd9ce6f62d90d5da627cccc14cb088696444/README.md#usage-for-dspci).
