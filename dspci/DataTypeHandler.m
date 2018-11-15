@@ -168,9 +168,7 @@
     if(!printJSON && dataType == DT_LIST_DEFAULT_INT) ddprintf(@"Using PCI.IDs %@\n", fetchDate);
 
     NSMutableArray *deviceList = [NSMutableArray array];
-    NSDictionary *tmpDevice;
     for (pciDevice *device in [devices sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) { return [obj1 bdf] - [obj2 bdf]; }]){
-        tmpDevice = device.lspciDictionary;
         [deviceList addObject:[self getPCIDeviceInfo:dataType device:device]];
     }
     // Print
@@ -181,7 +179,7 @@
 - (id) getPCIDeviceInfo: (unsigned) dataType device: (pciDevice *) device {
     switch (dataType) {
         case DT_LIST_DEFAULT_INT:
-            return printJSON ? device.lspciDictionary : [NSString stringWithFormat:@"%02lx:%02lx.%01lx %@ [%04lx]: %@ %@ [%04lx:%04lx]%@%@", [[device.bus objectAtIndex:0] integerValue], [[device.bus objectAtIndex:1] integerValue], [[device.bus objectAtIndex:2] integerValue], device.subClassString, device.pciClassCode.integerValue>>8, device.vendorString, device.deviceString, device.shadowVendor.integerValue, device.shadowDevice.integerValue, !device.revision.integerValue?@"":[NSString stringWithFormat:@" (rev %02lx)", device.revision.integerValue], !device.subDevice.integerValue?@"":[NSString stringWithFormat:@" (subsys %04lx:%04lx)", device.subVendor.integerValue, device.subDevice.integerValue]];
+            return printJSON ? device.lspciDictionary : device.lspciString;
         case DT_LIST_PCI_ID_INT:
             return [NSString stringWithFormat:@"%04lx:%04lx", device.shadowVendor.integerValue, device.shadowDevice.integerValue];
     }
