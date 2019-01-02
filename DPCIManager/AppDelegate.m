@@ -220,7 +220,7 @@
 #pragma mark Logging
 -(void)readLog:(NSData *)data{
     [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] enumerateLinesUsingBlock:^(NSString *line, BOOL *stop){
-        if ([line rangeOfString:@"kextd"].location != NSNotFound || [line rangeOfString:@"kextcache"].location != NSNotFound || [line rangeOfString:@"DirectHW"].location != NSNotFound || [line rangeOfString:@"Repair Permissions"].location != NSNotFound)
+        if ([line rangeOfString:@"kextd"].location != NSNotFound || [line rangeOfString:@"kextcache"].location != NSNotFound || [line rangeOfString:@"Repair Permissions"].location != NSNotFound)
             [self logLine:[line substringFromIndex:[line rangeOfString:@" " options:0 range:NSMakeRange(16, line.length-16)].location+1]];
     }];
 }
