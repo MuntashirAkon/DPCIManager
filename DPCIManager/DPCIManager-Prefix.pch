@@ -11,6 +11,7 @@
 #define assignWithNotice(x,y,z) [x willChangeValueForKey:@""#y];y=z;[x didChangeValueForKey:@""#y];
 #define muteWithNotice(x,y,z) [x willChangeValueForKey:@""#y];z;[x didChangeValueForKey:@""#y];
 #define strHexDec(x) strtol([x UTF8String], NULL, 16)
+#define pciIDsPath [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:@"pci.ids"]
 NS_INLINE NSError* ModalError(NSError *error){
     if (error)
         [[NSAlert alertWithError:error] runModal];

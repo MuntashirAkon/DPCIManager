@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		8716DE1F21285D0D00C47DE6 /* JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8716DE1C2128553200C47DE6 /* JSON.m */; };
 		8726C0E9212ABAB5000177BF /* DataTypeHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8726C0E8212ABAB5000177BF /* DataTypeHandler.m */; };
-		876B527321288815003E6A82 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 876B527221288815003E6A82 /* README.md */; };
 		876B52812129F464003E6A82 /* dd_getopt_long-fbsd.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52782129F463003E6A82 /* dd_getopt_long-fbsd.m */; };
 		876B52822129F464003E6A82 /* DDCliApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B52792129F463003E6A82 /* DDCliApplication.m */; };
 		876B52832129F464003E6A82 /* DDCliParseException.m in Sources */ = {isa = PBXBuildFile; fileRef = 876B527B2129F464003E6A82 /* DDCliParseException.m */; };
@@ -292,6 +291,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = B02571301601496300B0E1EB;
@@ -311,7 +311,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				876B527321288815003E6A82 /* README.md in Resources */,
 				B02571561601496400B0E1EB /* MainMenu.xib in Resources */,
 				B025716A16018D0600B0E1EB /* DPCIManager.icns in Resources */,
 				B025716C16018D9600B0E1EB /* pci.ids in Resources */,
@@ -333,7 +332,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CPV=$[ CURRENT_PROJECT_VERSION+1 ]\nsed -i '' \"s/CURRENT_PROJECT_VERSION = $CURRENT_PROJECT_VERSION/CURRENT_PROJECT_VERSION = $CPV/\" $PROJECT_NAME.xcodeproj/project.pbxproj";
+			shellScript = "CPV=$[ CURRENT_PROJECT_VERSION+1 ]\nsed -i '' \"s/CURRENT_PROJECT_VERSION = $CURRENT_PROJECT_VERSION/CURRENT_PROJECT_VERSION = $CPV/\" $PROJECT_NAME.xcodeproj/project.pbxproj\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -407,8 +406,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_MARKETING_VERSION = 1.9;
-				CURRENT_PROJECT_VERSION = 291;
+				CURRENT_MARKETING_VERSION = 2.0;
+				CURRENT_PROJECT_VERSION = 311;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -457,8 +456,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_MARKETING_VERSION = 1.9;
-				CURRENT_PROJECT_VERSION = 291;
+				CURRENT_MARKETING_VERSION = 2.0;
+				CURRENT_PROJECT_VERSION = 311;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -480,7 +479,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_MARKETING_VERSION = 1.9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "DPCIManager/DPCIManager-Info.plist";
@@ -494,7 +492,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_MARKETING_VERSION = 1.9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "DPCIManager/DPCIManager-Info.plist";
@@ -540,7 +537,6 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
-				CURRENT_MARKETING_VERSION = 1.9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/DPCIManager/DPCIManager-Info.plist";
@@ -561,7 +557,6 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
-				CURRENT_MARKETING_VERSION = 1.9;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DPCIManager/DPCIManager-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/DPCIManager/DPCIManager-Info.plist";

@@ -151,7 +151,7 @@
     return -1;
 }
 +(NSArray *)readIDs{
-    FILE *handle = fopen([[NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"] fileSystemRepresentation], "rb");
+    FILE *handle = fopen([pciIDsPath fileSystemRepresentation], "rb");
     NSMutableDictionary *classes = [NSMutableDictionary dictionary];
     NSMutableDictionary *vendors = [NSMutableDictionary dictionary];
     NSNumber *currentClass;

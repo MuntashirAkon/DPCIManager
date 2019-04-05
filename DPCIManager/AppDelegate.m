@@ -32,6 +32,12 @@
 #pragma mark ApplicationDelegate
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification{
     // Insert code here to initialize your application
+    NSString *pciIDsCachePath = pciIDsPath;
+    NSString *pciIDsBundlePath = [NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"];
+    if(![NSFileManager.defaultManager fileExistsAtPath:pciIDsCachePath]){
+        [NSFileManager.defaultManager copyItemAtPath:pciIDsBundlePath toPath:pciIDsCachePath error:nil];
+        [NSFileManager.defaultManager setAttributes:@{NSFileModificationDate: [[NSFileManager.defaultManager attributesOfItemAtPath:pciIDsBundlePath error:nil] fileModificationDate]} ofItemAtPath:pciIDsCachePath error:nil];
+    }
     self.patch = @"0x00000000";
     self.bdmesg = [AppDelegate bdmesg];
     self.pcis = [pciDevice readIDs];
@@ -86,7 +92,7 @@
 }
 -(IBAction)updateIDs:(id)sender{
     [sender setEnabled:false];
-    if ([URLTask conditionalGet:[NSURL URLWithString:@"https://pci-ids.ucw.cz/pci.ids"] toFile:[NSBundle.mainBundle pathForResource:@"pci" ofType:@"ids"]]) {
+    if ([URLTask conditionalGet:[NSURL URLWithString:@"https://pci-ids.ucw.cz/pci.ids"] toFile:pciIDsPath]) {
         [sender setLabel:@"Found"];
         self.pcis = [pciDevice readIDs];
     }
