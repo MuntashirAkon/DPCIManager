@@ -223,6 +223,25 @@
         IOObjectRelease(service);
     }
 }
+
+-(IBAction)savePCIInfo:(id)sender{
+    NSArray *devices = [pciDevice readIDs];
+    NSMutableString *deviceList = NSMutableString.string;
+    for (pciDevice *device in [devices sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) { return [obj1 bdf] - [obj2 bdf]; }]){
+        [deviceList appendString:device.lspciString];
+        [deviceList appendString:@"\n"];
+    }
+    // Save info
+    NSSavePanel *sp = NSSavePanel.savePanel;
+    [sp setDirectoryURL:[NSURL URLWithString:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]]];
+    [sp setAllowedFileTypes:@[@"txt"]];
+    [sp beginSheetModalForWindow:NSApp.mainWindow completionHandler:^(NSInteger result){
+        if(result == NSFileHandlingPanelOKButton){
+            [sp orderOut:self];
+            [deviceList writeToURL:sp.URL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        }
+    }];
+}
 #pragma mark Logging
 -(void)readLog:(NSData *)data{
     [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] enumerateLinesUsingBlock:^(NSString *line, BOOL *stop){

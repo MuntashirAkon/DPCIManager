@@ -42,6 +42,7 @@ typedef struct {
 -(IBAction)rebuild:(id)sender;
 -(IBAction)install:(id)sender;
 -(IBAction)fetchvBIOS:(id)sender;
+-(IBAction)savePCIInfo:(id)sender;
 -(void)logTask:(NSData *)data;
 
 @end
