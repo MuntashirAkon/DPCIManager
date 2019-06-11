@@ -367,7 +367,7 @@
             IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
             IORegistryEntryGetRegistryEntryID(parent, &new);
             if (card && new!=old){
-                [card setObject:@(ports) forKey:@"ports"];
+                [card setObject:@(ports) forKey:@"Ports"];
                 [temp addObject:[card copy]];
                 card = nil;
                 ports = 0;
@@ -403,7 +403,7 @@
             IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent);
             IORegistryEntryGetRegistryEntryID(parent, &new);
             if (card && new != old){
-                [card setObject:@(ports) forKey:@"ports"];
+                [card setObject:@(ports) forKey:@"Ports"];
                 [temp addObject:[card copy]];
                 card = nil;
                 ports = 0;
